@@ -16,7 +16,7 @@ Add GeoBridgeBundle in your composer.json:
 }
 ```
 
-Now update composer.
+Now update composer.phar
 
 Composer will install the bundle to your project's `vendor/yit` directory.
 
@@ -39,7 +39,7 @@ public function registerBundles()
 
 ### If you will use geo_address form field in your project
 
-## Step 3: Add the following configuration in app/config/config.yml
+#### Step 3: Add the following configuration in app/config/config.yml
 
 ``` yaml
 # app/config/config.yml
@@ -50,7 +50,7 @@ twig:
                 - 'YitGeoBridgeBundle:Geo:address.html.twig'
 ```
 
-## Step 4: Import GeoBridgeBundle routing files
+#### Step 4: Import GeoBridgeBundle routing files
 
 ``` yaml
 # app/config/routing.yml
@@ -59,7 +59,7 @@ yit_geo_bridge:
     prefix:   /
 ```
 
-    Now the bundle is configured and ready to use, if you need to use in entity address, street or district which will
+Now the bundle is configured and ready to use, if you need to use in entity address, street or district which will
 a relation with GeoBundle addresses, streets and districts, then you will implements the Addressable, Streetable and
 Districtable interfaces accordingly in your interfaces. And than when you will load your entity from db, GeoBridgeBundle
 will automatically call interface functions with corresponding arguments, to set all necessary information.
