@@ -21,13 +21,26 @@ class GeoBridge
      */
     public function getAddressById($id)
     {
-        $address = @file_get_contents(self::GEO_DOMAIN . 'api/addresses/' . $id);
+        $address = apc_fetch('address_' . $id);
 
-        if ($address)
+        if ($address === false)
         {
-            return json_decode($address);
+            $address = @file_get_contents(self::GEO_DOMAIN . 'api/addresses/' . $id);
+
+            if ($address)
+            {
+                $address = json_decode($address);
+            }
+            else
+            {
+                $address = null;
+            }
+
+            //Store address in cache 24 hours
+            apc_add('address_' . $id, $address, 86400);
         }
-        return null;
+
+        return $address;
     }
 
     /**
@@ -40,19 +53,29 @@ class GeoBridge
      */
     public function searchAddress($search, $limit = 0)
     {
-        $addresses = @file_get_contents(self::GEO_DOMAIN . 'api/addresses/'. $search .'/search/' . $limit);
 
-        if ($addresses)
+        $addresses = apc_fetch('addressSearch_' . $search . '_' . $limit);
+
+        if ($addresses === false)
         {
-            $addresses = json_decode($addresses);
+            $addresses = @file_get_contents(self::GEO_DOMAIN . 'api/addresses/'. $search .'/search/' . $limit);
 
-            if (!isset($addresses->status) || $addresses->status == 201)
+            if ($addresses)
             {
-                return $addresses;
+                $addresses = json_decode($addresses);
+
+                if (isset($addresses->status) && !$addresses->status == 201) {
+                    $addresses = null;
+                }
             }
+            else {
+                $addresses = null;
+            }
+
+            apc_add('addressSearch_' . $search . '_' . $limit, $addresses, 86400);
         }
 
-        return null;
+        return $addresses;
     }
 
     /**
@@ -65,10 +88,10 @@ class GeoBridge
     public function putAddress($addressString)
     {
         $opts = array('http' =>
-                    array(
+                array(
                         'method'  => 'PUT',
                         'header'  => "Content-Type: application/json",
-                    )
+                )
         );
 
         $context  = stream_context_create($opts);
