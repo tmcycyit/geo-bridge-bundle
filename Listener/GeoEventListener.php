@@ -10,6 +10,8 @@ namespace Yit\GeoBridgeBundle\Listener;
 
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Yit\GeoBridgeBundle\Model\Addressable;
+use Yit\GeoBridgeBundle\Model\Districtable;
+use Yit\GeoBridgeBundle\Model\Streetable;
 use Symfony\Component\DependencyInjection\Container;
 
 class GeoEventListener
@@ -46,9 +48,35 @@ class GeoEventListener
                 }
                 if (isset($address->h_number)) {
                     $entity->setAddressHNumber($address->h_number);
-
                 }
 
+            }
+        }
+
+        if ($entity instanceof Districtable)
+        {
+            $district = $this->container->get('geo_bridge')->getDistrictById($entity->getDistrictId());
+
+            if ($district)
+            {
+                if (isset($district->title)) {
+                    $entity->setDistrictTitle($district->title);
+                }
+            }
+        }
+
+        if ($entity instanceof Streetable)
+        {
+            $street = $this->container->get('geo_bridge')->getStreetById($entity->getAddressId());
+
+            if ($street)
+            {
+                if (isset($street->arm_name)) {
+                    $entity->setStreetArmName($street->arm_name);
+                }
+                if (isset($street->eng_name)) {
+                    $entity->setStreetEngName($street->eng_name);
+                }
             }
         }
 
