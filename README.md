@@ -48,7 +48,7 @@ twig:
     form:
             resources:
                 - 'YitGeoBridgeBundle:Geo:address.html.twig'
-
+```
 
 ### Step 4: If you will use geo_address form field in your project
 
@@ -59,7 +59,7 @@ Import GeoBridgeBundle routing files
 yit_geo_bridge:
     resource: "@YitGeoBridgeBundle/Resources/config/routing.yml"
     prefix:   /
-
+```
 
 ### Now the bundle is configured and ready to use, if you need to use in entity address, street or district which will
 a relation with GeoBundle addresses, streets and districts, then you will implements the Addressable, Streetable and
@@ -68,7 +68,7 @@ will automatically call interface functions with corresponding arguments, to set
 
 ### The interface implementations here`
 
-
+``` php
 namespace Yit\GeoBridgeBundle\Model;
 interface Addressable
 {
@@ -96,40 +96,42 @@ interface Streetable
     public function setStreetArmName($armName);
     public function setStreetEngName($engName);
 }
+```
 
 ### You can also use 'geo-bridge' service to use some functions, there are here`
 
-# This function return address object by given id
-# If there are not any address with such id return null
+``` php
+//This function return address object by given id
+//If there are not any address with such id return null
 public function getAddressById($id)
 
-# This function is used to get $limit addresses by $search string
-# If there are not any address with such content return null
+//This function is used to get $limit addresses by $search string
+//If there are not any address with such content return null
 public function searchAddress($search, $limit = 0)
 
-# This function is used to create new address in Geo Project with $addressString title
-# when access return id of created Address else return null
+//This function is used to create new address in Geo Project with $addressString title
+//when access return id of created Address else return null
 public function putAddress($addressString)
 
-# This function return district object by given id
-# If there are not any district with such id return null
+//This function return district object by given id
+//If there are not any district with such id return null
 public function getDistrictById($id)
 
-# This function is used to get districts
-# If there are not any district return null
+//This function is used to get districts
+//If there are not any district return null
 public function getDistricts()
 
-# This function is used to get districts in array 'id' => 'title'
-# If there are not any district return empty array
+//This function is used to get districts in array 'id' => 'title'
+//If there are not any district return empty array
 public function getDistrictList()
 
-# This function is used to get all streets by district id
-# If there are not any street return null
+//This function is used to get all streets by district id
+//If there are not any street return null
 public function getStreetsByDistrict($districtID)
 
-# This function is used get street by given id
-# If there are not any street by given id return null
+//This function is used get street by given id
+//If there are not any street by given id return null
 public function getStreetById($id)
-
+```
 
 
