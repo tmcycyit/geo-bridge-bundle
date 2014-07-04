@@ -1,0 +1,14 @@
+{
+
+    "name": "yit/geo-bridge-bundle",
+    "type": "symfony-bundle",
+    "license": "YIT",
+    "autoload": {
+        "psr-0": { "Yit\\GeoBridgeBundle": "" }
+    },
+    "require": {
+
+    },
+
+    "target-dir": "Yit/GeoBridgeBundle"
+}

@@ -1,0 +1,4 @@
+yit_geo_bridge_autocomplete:
+    resource: Yit\GeoBridgeBundle\Controller\GeoBridgeController
+    type:     annotation
+    prefix:   /geo

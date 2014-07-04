@@ -1,0 +1,14 @@
+{% block geo_address_widget %}
+    <input type="text"
+            {% if attr is defined %}
+                {% if att['class'] is defined %}
+                    class={{ attr['class'] }}
+                {% endif %}
+            {% endif %}
+            {% if attr is defined %}
+                {% if attr['data-id'] is defined %}
+                    data-id="{{ attr['data-id'] }}"
+                {% endif %}
+            {% endif %}
+    />
+{% endblock %}
