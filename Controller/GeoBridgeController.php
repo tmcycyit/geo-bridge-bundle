@@ -17,13 +17,13 @@ class GeoBridgeController extends Controller
     /**
      * This function is used to generate route for addresses autocomplete
      *
-     * @Route("/autocomplete/{search}/{limit}", defaults={"limit" = 10})
+     * @Route("/autocomplete/{search}")
      * @param $search
-     * @param $limit
      * @return Response
      */
-    public function getAddressesAction($search, $limit)
+    public function getAddressesAction($search)
     {
+        $limit = 10;
         $addresses = $this->get('geo_bridge')->searchAddress($search, $limit);
         $addresses = json_encode($addresses);
 
