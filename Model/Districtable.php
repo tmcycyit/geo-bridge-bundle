@@ -12,5 +12,5 @@ interface Districtable
 {
     public function getDistrictId();
 
-    public function setDistrictTitle();
+    public function setDistrictTitle($title);
 }

@@ -67,7 +67,7 @@ class GeoEventListener
 
         if ($entity instanceof Streetable)
         {
-            $street = $this->container->get('geo_bridge')->getStreetById($entity->getAddressId());
+            $street = $this->container->get('geo_bridge')->getStreetById($entity->getStreetId());
 
             if ($street)
             {

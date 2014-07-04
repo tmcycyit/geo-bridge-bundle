@@ -12,7 +12,7 @@ interface Streetable
 {
     public function getStreetId();
 
-    public function setStreetArmName();
+    public function setStreetArmName($armName);
 
-    public function setStreetEngName();
+    public function setStreetEngName($engName);
 }
