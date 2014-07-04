@@ -50,7 +50,7 @@ twig:
                 - 'YitGeoBridgeBundle:Geo:address.html.twig'
 
 
-###Step 4: If you will use geo_address form field in your project
+### Step 4: If you will use geo_address form field in your project
 
 Import GeoBridgeBundle routing files
 
@@ -61,12 +61,12 @@ yit_geo_bridge:
     prefix:   /
 
 
-###Now the bundle is configured and ready to use, if you need to use in entity address, street or district which will
+### Now the bundle is configured and ready to use, if you need to use in entity address, street or district which will
 a relation with GeoBundle addresses, streets and districts, then you will implements the Addressable, Streetable and
 Districtable interfaces accordingly in your interfaces. And than when you will load your entity from db, GeoBridgeBundle
 will automatically call interface functions with corresponding arguments, to set all necessary information.
 
-###The interface implementations here`
+### The interface implementations here`
 
 
 namespace Yit\GeoBridgeBundle\Model;
@@ -97,7 +97,7 @@ interface Streetable
     public function setStreetEngName($engName);
 }
 
-###You can also use 'geo-bridge' service to use some functions, there are here`
+### You can also use 'geo-bridge' service to use some functions, there are here`
 
 # This function return address object by given id
 # If there are not any address with such id return null
