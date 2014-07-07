@@ -269,4 +269,40 @@ class GeoBridge
 
         return $street;
     }
+
+
+    /**
+     * This function is used to get $limit streets by $search string
+     * If there are not any street with such content return null
+     *
+     * @param $search
+     * @param int $limit
+     * @return mixed|null|string
+     */
+    public function searchStreet($search, $limit = 0)
+    {
+
+        $streets = apc_fetch('streetSearch_' . $search . '_' . $limit);
+
+        if ($streets === false)
+        {
+            $streets = @file_get_contents(self::GEO_DOMAIN . 'api/streets/'. $search .'/search/' . $limit);
+
+            if ($streets)
+            {
+                $streets = json_decode($streets);
+
+                if (isset($streets->status) && !$streets->status == 201) {
+                    $streets = null;
+                }
+            }
+            else {
+                $streets = null;
+            }
+
+            apc_add('streetSearch_' . $search . '_' . $limit, $streets, 86400);
+        }
+
+        return $streets;
+    }
 }

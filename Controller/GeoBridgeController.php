@@ -14,19 +14,49 @@ use Symfony\Component\HttpFoundation\Response;
 
 class GeoBridgeController extends Controller
 {
+    const AUTOCOMPLETE_LIMIT = 10;
     /**
      * This function is used to generate route for addresses autocomplete
      *
-     * @Route("/autocomplete/{search}")
+     * @Route("/address/autocomplete/{search}")
      * @param $search
      * @return Response
      */
     public function getAddressesAction($search)
     {
-        $limit = 10;
-        $addresses = $this->get('geo_bridge')->searchAddress($search, $limit);
+        $addresses = $this->get('geo_bridge')->searchAddress($search, self::AUTOCOMPLETE_LIMIT);
         $addresses = json_encode($addresses);
 
         return new Response($addresses);
+    }
+
+    /**
+     * This function is used to generate route for street autocomplete
+     *
+     * @Route("/street/autocomplete/{search}")
+     * @param $search
+     * @return Response
+     */
+    public function getStreetsAction($search)
+    {
+        $streets = $this->get('geo_bridge')->searchStreet($search, self::AUTOCOMPLETE_LIMIT);
+        $streets = json_encode($streets);
+
+        return new Response($streets);
+    }
+
+    /**
+     * This function is used to put address on geo project
+     * If there are any error return null
+     *
+     * @Route("/putAddress/{addressString}")
+     * @param $addressString
+     * @return Response
+     */
+    public function putAddressAction($addressString)
+    {
+        $addressId = $this->get('geo_bridge')->putAddress($addressString);
+
+        return new Response($addressId);
     }
 }

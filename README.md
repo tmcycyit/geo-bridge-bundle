@@ -130,6 +130,10 @@ public function getStreetsByDistrict($districtID)
 //This function is used get street by given id
 //If there are not any street by given id return null
 public function getStreetById($id)
+
+//This function is used to get $limit streets by $search string
+//If there are not any street with such content return null
+public function searchStreet($search, $limit = 0)
 ```
 
 
