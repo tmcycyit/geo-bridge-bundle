@@ -15,10 +15,11 @@ use Symfony\Component\HttpFoundation\Response;
 class GeoBridgeController extends Controller
 {
     const AUTOCOMPLETE_LIMIT = 10;
+
     /**
      * This function is used to generate route for addresses autocomplete
      *
-     * @Route("/address/autocomplete/{search}")
+     * @Route("/address/autocomplete/{search}", requirements={"search" = ".+"})
      * @param $search
      * @return Response
      */
@@ -33,7 +34,7 @@ class GeoBridgeController extends Controller
     /**
      * This function is used to generate route for street autocomplete
      *
-     * @Route("/street/autocomplete/{search}")
+     * @Route("/street/autocomplete/{search}", requirements={"search" = ".+"})
      * @param $search
      * @return Response
      */
@@ -49,7 +50,7 @@ class GeoBridgeController extends Controller
      * This function is used to put address on geo project
      * If there are any error return null
      *
-     * @Route("/putAddress/{addressString}")
+     * @Route("/putAddress/{addressString}", requirements={"addressString" = ".+"})
      * @param $addressString
      * @return Response
      */

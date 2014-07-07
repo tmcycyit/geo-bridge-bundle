@@ -1,31 +1,8 @@
 'use strict'
 
-angular.module("YitAutocomplete",['angucomplete']).constant("YitGeoValue",{showButton: false,ngModel: ''})
-        .config(["$httpProvider","YitGeoValue",function($httpProvider,YitGeoValue){
-            $httpProvider.interceptors.push(function(){
-                return {
-                    response: function(config){
-                        if((!angular.isDefined(config.data.data) && config.data.status === 204) || config.data === "null"){
-                            YitGeoValue.showButton = true;
-                        }
-                        else {
-                            YitGeoValue.showButton = false;
-                        }
-                        return config;
-                    },
-                    request: function(config){
-                        if(config.url.indexOf(".html") === -1){
-                            config.url = "/app_dev.php"+config.url;
-                        }
-                        var model = config.url;
-                        YitGeoValue.ngModel = model.split("/");
-                        return config;
-                    }
-                }
-            })
-        }]).directive("yiAutocomplete",["$http","YitGeoValue",function($http,YitGeoValue){
+angular.module("YitAutocomplete",['angucomplete']).directive("yitAutocomplete",["$http",function($http){
             return {
-                restrict: "A",
+                restrict: "E",
                 scope: {
                   select: "=yiSelectedObject"
                 },

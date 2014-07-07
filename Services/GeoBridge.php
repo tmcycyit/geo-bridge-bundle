@@ -57,26 +57,18 @@ class GeoBridge
      */
     public function searchAddress($search, $limit = 0)
     {
+        $addresses = @file_get_contents(self::GEO_DOMAIN . 'api/addresses/'. $search .'/search/' . $limit);
 
-        $addresses = apc_fetch('addressSearch_' . $search . '_' . $limit);
-
-        if ($addresses === false)
+        if ($addresses)
         {
-            $addresses = @file_get_contents(self::GEO_DOMAIN . 'api/addresses/'. $search .'/search/' . $limit);
+            $addresses = json_decode($addresses);
 
-            if ($addresses)
-            {
-                $addresses = json_decode($addresses);
-
-                if (isset($addresses->status) && !$addresses->status == 201) {
-                    $addresses = null;
-                }
-            }
-            else {
+            if (isset($addresses->status) && $addresses->status != 201) {
                 $addresses = null;
             }
-
-            apc_add('addressSearch_' . $search . '_' . $limit, $addresses, 86400);
+        }
+        else {
+            $addresses = null;
         }
 
         return $addresses;
@@ -281,26 +273,19 @@ class GeoBridge
      */
     public function searchStreet($search, $limit = 0)
     {
+        $streets = @file_get_contents(self::GEO_DOMAIN . 'api/streets/'. $search .'/search/' . $limit);
 
-        $streets = apc_fetch('streetSearch_' . $search . '_' . $limit);
-
-        if ($streets === false)
+        if ($streets)
         {
-            $streets = @file_get_contents(self::GEO_DOMAIN . 'api/streets/'. $search .'/search/' . $limit);
+            $streets = json_decode($streets);
 
-            if ($streets)
-            {
-                $streets = json_decode($streets);
-
-                if (isset($streets->status) && !$streets->status == 201) {
-                    $streets = null;
-                }
-            }
-            else {
+            if (isset($streets->status) && $streets->status != 201) {
                 $streets = null;
             }
-
-            apc_add('streetSearch_' . $search . '_' . $limit, $streets, 86400);
+        }
+        else
+        {
+            $streets = null;
         }
 
         return $streets;
