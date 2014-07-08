@@ -11,6 +11,7 @@ Add GeoBridgeBundle in your composer.json:
 ```js
 {
     "require": {
+        ...
         "yit/geo-bridge-bundle": "dev-master",
     }
 }
@@ -58,6 +59,20 @@ yit_geo_bridge:
     resource: "@YitGeoBridgeBundle/Resources/config/routing.yml"
     prefix:   /
 ```
+
+And then add YitAutocomplete Angularjs module from Bower
+
+Then you can add a new form field`
+
+``` php
+$this->createFormBuilder()
+             ...
+             ->add('address', 'geo_address', array('attr' => array('data-id' => 5)))
+             ...
+```
+
+data-id attribute must be unique for each geo_address field.
+
 
 Now the bundle is configured and ready to use, if you need to use in entity address, street or district which will
 a relation with GeoBundle addresses, streets and districts, then you will implements the Addressable, Streetable and
