@@ -1,19 +1,48 @@
 {% block geo_address_widget %}
+
+    {% if attr is not defined %}
+        {% set attr = [] %}
+    {% endif %}
+    {# check data-id #}
+    {% if attr.data_id is not defined %}
+        {% set attr = attr|merge({'data_id': 1}) %}
+    {% endif %}
+    {# check placeholder #}
+    {% if attr.placeholder is not defined %}
+        {% set attr = attr|merge({'placeholder': 'Հասցեի Որոնում'}) %}
+    {% endif %}
+    {# check allow_new #}
+    {% if attr.allow_new is not defined %}
+        {% set attr = attr|merge({'allow_new': false}) %}
+    {% endif %}
+    {# check button_name #}
+    {% if attr.button_name is not defined %}
+        {% set attr = attr|merge({'button_name': 'Ավելացնել'}) %}
+    {% endif %}
+    {# check button_class #}
+    {% if attr.button_class is not defined %}
+        {% set attr = attr|merge({'button_class': ''}) %}
+    {% endif %}
+    {# check input_class #}
+    {% if attr.input_class is not defined %}
+            {% set attr = attr|merge({'input_class': 'form-control form-control-small'}) %}
+    {% endif %}
+
     {% verbatim %}
         <input type="hidden" class="form-control form-control-small"
-            value="{{ testObj{% endverbatim %}{{ attr['data-id'] }} {% verbatim %}.originalObject.id }}"/>
-        <yit-autocomplete id="members{% endverbatim %}{{ attr['data-id'] }} {% verbatim %}"
-            placeholder="Search members"
+            value="{{ testObj{% endverbatim %}{{ attr['data_id'] }} {% verbatim %}.originalObject.id }}"/>
+        <yit-autocomplete id="members{% endverbatim %}{{ attr['data_id'] }} {% verbatim %}"
+            placeholder="{% endverbatim %}{{ attr['placeholder'] }} {% verbatim %}"
             pause="500"
-            selectedobject="testObj{% endverbatim %}{{ attr['data-id'] }} {% verbatim %}"
+            selectedobject="geoObj{% endverbatim %}{{ attr['data_id'] }} {% verbatim %}"
             url="/geo/address/autocomplete/"
             titlefield="title"
             datafield="data"
-            addbutton="new"
-            addbuttonclass="test"
-            addnew="true"
+            addbutton="{% endverbatim %}{{ attr['button_name'] }} {% verbatim %}"
+            addbuttonclass="{% endverbatim %}{{ attr['button_class'] }} {% verbatim %}"
+            addnew="{% endverbatim %}{{ attr['allow_new'] }} {% verbatim %}"
             addnewurl="/geo/putAddress/"
-            inputclass="form-control form-control-small">
+            inputclass="{% endverbatim %}{{ attr['input_class'] }} {% verbatim %}">
         </yit-autocomplete>
     {% endverbatim %}
 {% endblock %}

@@ -67,12 +67,27 @@ Then you can add a new form field`
 ``` php
 $this->createFormBuilder()
              ...
-             ->add('address', 'geo_address', array('attr' => array('data-id' => 5)))
+             ->add('address', 'geo_address', array('attr' => array('data-id' => 1)))
              ...
 ```
 
-data-id attribute must be unique for each geo_address field.
+data_id attribute must be unique for each geo_address field.
+you can also add other attributes to the form field.
 
+``` php
+$this->createFormBuilder()
+             ...
+             ->add('address', 'geo_address', array(
+                'attr' => array(
+                    'data-id'       => 1,                   //must be unique for each such field
+                    'placeholder'   => 'text for input',    //placeholder text
+                    'allow_new'     => true,                //set true to show new button when address not found
+                    'button_name'   => 'buttonName',        //text to show on new button
+                    'button_class'  => 'buttonClass',       //new button class
+                    'input_class'   => 'inputClass'         //input class
+                )))
+             ...
+```
 
 Now the bundle is configured and ready to use, if you need to use in entity address, street or district which will
 a relation with GeoBundle addresses, streets and districts, then you will implements the Addressable, Streetable and
