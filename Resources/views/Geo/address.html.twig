@@ -1,3 +1,19 @@
 {% block geo_address_widget %}
-    <input type="number" value="1"/>
+    {% verbatim %}
+        <input type="hidden" class="form-control form-control-small"
+            value="{{ testObj{% endverbatim %}{{ attr['data-id'] }} {% verbatim %}.originalObject.id }}"/>
+        <yit-autocomplete id="members{% endverbatim %}{{ attr['data-id'] }} {% verbatim %}"
+            placeholder="Search members"
+            pause="500"
+            selectedobject="testObj{% endverbatim %}{{ attr['data-id'] }} {% verbatim %}"
+            url="/geo/address/autocomplete/"
+            titlefield="title"
+            datafield="data"
+            addbutton="new"
+            addbuttonclass="test"
+            addnew="true"
+            putaddressurl="/geo/putAddress/"
+            inputclass="form-control form-control-small">
+        </yit-autocomplete>
+    {% endverbatim %}
 {% endblock %}
