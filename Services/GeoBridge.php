@@ -12,6 +12,44 @@ class GeoBridge
 {
     const GEO_DOMAIN = 'http://geo.yerevan.am/';
 
+    /**
+     * This function is used to get content from $link
+     *
+     * @param $link
+     * @param null $context
+     * @return mixed|null|string
+     */
+    private function getContent($link, $context = null)
+    {
+        $content = @file_get_contents($link, false, $context);
+
+        if ($content) {
+            $content = json_decode($content);
+
+            if (isset($content->status) && $content->status != 201) {
+                $content = null;
+            }
+        }
+        else {
+            $content = null;
+        }
+
+        return $content;
+    }
+
+    /**
+     * This function is used to produce url parameters for special symbols
+     *
+     * @param $string
+     * @return mixed
+     */
+    private function produceUrlParameter($string)
+    {
+        $result = rawurlencode($string);
+        return str_replace('%2F', '/', $result);
+    }
+
+
     //******************************************
     //*************** Address ******************
     //******************************************
@@ -29,17 +67,7 @@ class GeoBridge
 
         if ($address === false)
         {
-            $address = @file_get_contents(self::GEO_DOMAIN . 'api/addresses/' . $id);
-
-            if ($address)
-            {
-                $address = json_decode($address);
-            }
-            else
-            {
-                $address = null;
-            }
-
+            $address = $this->getContent(self::GEO_DOMAIN . 'api/addresses/' . $id);
             //Store address in cache 24 hours
             apc_add('address_' . $id, $address, 86400);
         }
@@ -57,21 +85,8 @@ class GeoBridge
      */
     public function searchAddress($search, $limit = 0)
     {
-        $addresses = @file_get_contents(self::GEO_DOMAIN . 'api/addresses/'. $search .'/search/' . $limit);
-
-        if ($addresses)
-        {
-            $addresses = json_decode($addresses);
-
-            if (isset($addresses->status) && $addresses->status != 201) {
-                $addresses = null;
-            }
-        }
-        else {
-            $addresses = null;
-        }
-
-        return $addresses;
+        $search = $this->produceUrlParameter($search);
+        return $this->getContent(self::GEO_DOMAIN . 'api/addresses/'. $search .'/search/' . $limit);
     }
 
     /**
@@ -89,16 +104,10 @@ class GeoBridge
                         'header'  => "Content-Type: application/json",
                 )
         );
-
+        $addressString = $this->produceUrlParameter($addressString);
         $context  = stream_context_create($opts);
-        $result = @file_get_contents(self::GEO_DOMAIN . "api/addresses/" . $addressString, false, $context);
 
-        if ($result)
-        {
-            return $result;
-        }
-
-        return null;
+        return $this->getContent(self::GEO_DOMAIN . "api/addresses/" . $addressString, $context);
     }
 
     //******************************************
@@ -118,17 +127,7 @@ class GeoBridge
 
         if ($district === false)
         {
-            $district = @file_get_contents(self::GEO_DOMAIN . 'api/districts/' . $id);
-
-            if ($district)
-            {
-                $district = json_decode($district);
-            }
-            else
-            {
-                $district = null;
-            }
-
+            $district = $this->getContent(self::GEO_DOMAIN . 'api/districts/' . $id);
             //Store district in cache 24 hours
             apc_add('district_' . $id, $district, 86400);
         }
@@ -149,17 +148,7 @@ class GeoBridge
 
         if ($districts === false)
         {
-            $districts = @file_get_contents(self::GEO_DOMAIN . 'api/districts');
-
-            if ($districts)
-            {
-                $districts = json_decode($districts);
-            }
-            else
-            {
-                $districts = null;
-            }
-
+            $districts = $this->getContent(self::GEO_DOMAIN . 'api/districts');
             //Store districts in cache 24 hours
             apc_add('districts', $districts, 86400);
         }
@@ -208,16 +197,7 @@ class GeoBridge
 
         if ($streets === false)
         {
-            $streets = @file_get_contents(self::GEO_DOMAIN . 'api/districts/' . $districtID . '/streets');
-
-            if ($streets)
-            {
-                $streets = json_decode($streets);
-            }
-            else
-            {
-                $streets = null;
-            }
+            $streets = $this->getContent(self::GEO_DOMAIN . 'api/districts/' . $districtID . '/streets');
 
             //Store streets in cache 24 hours
             apc_add('district_streets', $streets, 86400);
@@ -244,16 +224,7 @@ class GeoBridge
 
         if ($street === false)
         {
-            $street = @file_get_contents(self::GEO_DOMAIN . 'api/streets/' . $id);
-
-            if ($street)
-            {
-                $street = json_decode($street);
-            }
-            else
-            {
-                $street = null;
-            }
+            $street = $this->getContent(self::GEO_DOMAIN . 'api/streets/' . $id);
 
             //Store district in cache 24 hours
             apc_add('street_' . $id, $street, 86400);
@@ -273,21 +244,7 @@ class GeoBridge
      */
     public function searchStreet($search, $limit = 0)
     {
-        $streets = @file_get_contents(self::GEO_DOMAIN . 'api/streets/'. $search .'/search/' . $limit);
-
-        if ($streets)
-        {
-            $streets = json_decode($streets);
-
-            if (isset($streets->status) && $streets->status != 201) {
-                $streets = null;
-            }
-        }
-        else
-        {
-            $streets = null;
-        }
-
-        return $streets;
+        $search = $this->produceUrlParameter($search);
+        return $this->getContent(self::GEO_DOMAIN . 'api/streets/'. $search .'/search/' . $limit);
     }
 }
