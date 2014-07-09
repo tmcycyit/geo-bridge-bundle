@@ -1,6 +1,4 @@
 yit_geo_bridge_autocomplete:
     resource: Yit\GeoBridgeBundle\Controller\GeoBridgeController
     type:     annotation
-    prefix:   /{_locale}/geo
-    requirements:
-            _locale: en|am
+    prefix:   /geo
