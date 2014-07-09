@@ -19,13 +19,22 @@ class GeoBridgeController extends Controller
     /**
      * This function is used to generate route for addresses autocomplete
      *
-     * @Route("/address/autocomplete/{search}", requirements={"search" = ".+"})
+     * @Route("/address/autocomplete/{search}", defaults = {"_locale" = "am"}, requirements={"search" = ".+"})
      * @param $search
      * @return Response
      */
     public function getAddressesAction($search)
     {
         $addresses = $this->get('geo_bridge')->searchAddress($search, self::AUTOCOMPLETE_LIMIT);
+
+        $locale = $this->getRequest()->getLocale();
+        foreach($addresses->data as &$address) {
+            if ($locale == "en") {
+                $address->title = $address->eng_title;
+            }
+            unset($address->eng_title);
+        }
+
         $addresses = json_encode($addresses);
 
         return new Response($addresses);
@@ -34,7 +43,7 @@ class GeoBridgeController extends Controller
     /**
      * This function is used to generate route for street autocomplete
      *
-     * @Route("/street/autocomplete/{search}", requirements={"search" = ".+"})
+     * @Route("/street/autocomplete/{search}", defaults = {"_locale" = "am"}, requirements={"search" = ".+"})
      * @param $search
      * @return Response
      */
@@ -50,7 +59,7 @@ class GeoBridgeController extends Controller
      * This function is used to put address on geo project
      * If there are any error return null
      *
-     * @Route("/putAddress/{addressString}", requirements={"addressString" = ".+"})
+     * @Route("/geo/putAddress/{addressString}", requirements={"addressString" = ".+"})
      * @param $addressString
      * @return Response
      */
