@@ -25,7 +25,7 @@ class GeoBridgeController extends Controller
      */
     public function getAddressesAction($search)
     {
-        $addresses = $this->get('geo_bridge')->searchAddress($search, self::AUTOCOMPLETE_LIMIT);
+        $addresses = $this->get('yit_geo')->searchAddress($search, self::AUTOCOMPLETE_LIMIT);
 
         $locale = $this->getRequest()->getLocale();
         foreach($addresses->data as &$address) {
@@ -49,7 +49,7 @@ class GeoBridgeController extends Controller
      */
     public function getStreetsAction($search)
     {
-        $streets = $this->get('geo_bridge')->searchStreet($search, self::AUTOCOMPLETE_LIMIT);
+        $streets = $this->get('yit_geo')->searchStreet($search, self::AUTOCOMPLETE_LIMIT);
         $streets = json_encode($streets);
 
         return new Response($streets);
@@ -65,7 +65,7 @@ class GeoBridgeController extends Controller
      */
     public function putAddressAction($addressString)
     {
-        $addressId = $this->get('geo_bridge')->putAddress($addressString);
+        $addressId = $this->get('yit_geo')->putAddress($addressString);
 
         return new Response($addressId);
     }

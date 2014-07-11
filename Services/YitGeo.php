@@ -8,7 +8,7 @@
 
 namespace Yit\GeoBridgeBundle\Services;
 
-class GeoBridge
+class YitGeo
 {
     const GEO_DOMAIN = 'http://geo.yerevan.am/';
 

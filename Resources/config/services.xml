@@ -6,12 +6,12 @@
 
     <services>
 
-        <service id="product.orm.listener" class="Yit\GeoBridgeBundle\Listener\GeoEventListener">
+        <service id="geo.event.listener" class="Yit\GeoBridgeBundle\Listener\GeoEventListener">
             <argument type="service" id="service_container" />
             <tag name="doctrine.event_listener" event="postLoad"/>
         </service>
 
-        <service id="geo_bridge" class="Yit\GeoBridgeBundle\Services\GeoBridge">
+        <service id="yit_geo" class="Yit\GeoBridgeBundle\Services\YitGeo">
         </service>
 
         <service id="geo.form.type.geo_address" class="Yit\GeoBridgeBundle\Form\Type\GeoAddressType">
