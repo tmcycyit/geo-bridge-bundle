@@ -7,8 +7,8 @@
         "psr-0": { "Yit\\GeoBridgeBundle": "" }
     },
     "require": {
-
+        "yit/map-bundle": "dev-master"
     },
-
+    
     "target-dir": "Yit/GeoBridgeBundle"
 }
