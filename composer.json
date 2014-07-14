@@ -9,6 +9,6 @@
     "require": {
         "yit/map-bundle": "dev-master"
     },
-    
+
     "target-dir": "Yit/GeoBridgeBundle"
 }

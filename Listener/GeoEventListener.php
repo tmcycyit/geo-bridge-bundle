@@ -30,7 +30,7 @@ class GeoEventListener
 
         if ($entity instanceof Addressable)
         {
-            $address = $this->container->get('geo_bridge')->getAddressById($entity->getAddressId());
+            $address = $this->container->get('yit_geo')->getAddressById($entity->getAddressId());
 
             if ($address)
             {
@@ -55,7 +55,7 @@ class GeoEventListener
 
         if ($entity instanceof Districtable)
         {
-            $district = $this->container->get('geo_bridge')->getDistrictById($entity->getDistrictId());
+            $district = $this->container->get('yit_geo')->getDistrictById($entity->getDistrictId());
 
             if ($district)
             {
@@ -67,7 +67,7 @@ class GeoEventListener
 
         if ($entity instanceof Streetable)
         {
-            $street = $this->container->get('geo_bridge')->getStreetById($entity->getStreetId());
+            $street = $this->container->get('yit_geo')->getStreetById($entity->getStreetId());
 
             if ($street)
             {
