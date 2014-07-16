@@ -30,7 +30,7 @@
 
     {% verbatim %}
         <input type="hidden" class="form-control form-control-small"
-            value="{{ testObj{% endverbatim %}{{ attr['data_id'] }} {% verbatim %}.originalObject.id }}"/>
+            ng-model="{{ geoObj{% endverbatim %}{{ attr['data_id'] }} {% verbatim %}.originalObject.id }}" yi-input/>
         <yit-autocomplete id="members{% endverbatim %}{{ attr['data_id'] }} {% verbatim %}"
             placeholder="{% endverbatim %}{{ attr['placeholder'] }} {% verbatim %}"
             pause="500"
