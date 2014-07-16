@@ -17,6 +17,19 @@ class GeoBridgeController extends Controller
     const AUTOCOMPLETE_LIMIT = 10;
 
     /**
+     * This function is used to get address by id
+     *
+     * @Route("/address/{addressId}", requirements={"addressId" = "\d+"})
+     *
+     * @param $addressId
+     * @return mixed
+     */
+    public function getAddress($addressId)
+    {
+        return $this->get('yit_geo')->getAddressById($addressId);
+    }
+
+    /**
      * This function is used to generate route for addresses autocomplete
      *
      * @Route("/address/autocomplete/{search}", requirements={"search" = ".+"})
