@@ -5,7 +5,7 @@
     {% endif %}
     {# check data-id #}
     {% if attr.data_id is not defined %}
-        {% set attr = attr|merge({'data_id': 1}) %}
+        {% set attr = attr|merge({'data_id': 2}) %}
     {% endif %}
     {# check placeholder #}
     {% if attr.placeholder is not defined %}
@@ -29,20 +29,26 @@
     {% endif %}
 
     {% verbatim %}
-        <input type="hidden" class="form-control form-control-small"
-            ng-model="{{ geoObj{% endverbatim %}{{ attr['data_id'] }} {% verbatim %}.originalObject.id }}" yi-input/>
+        <input type="hidden" {% endverbatim %}id="{{ id }}"name="{{ full_name }}" value="{{ value }}" {% verbatim %} class="form-control form-control-small"
+            ng-model="geoObj{% endverbatim %}{{ attr['data_id'] }}{% verbatim %}.originalObject.id" yi-input/>
         <yit-autocomplete id="members{% endverbatim %}{{ attr['data_id'] }} {% verbatim %}"
             placeholder="{% endverbatim %}{{ attr['placeholder'] }} {% verbatim %}"
             pause="500"
             selectedobject="geoObj{% endverbatim %}{{ attr['data_id'] }} {% verbatim %}"
-            url="/geo/address/autocomplete/"
+            url="/am/geo/address/autocomplete/"
             titlefield="title"
             datafield="data"
             addbutton="{% endverbatim %}{{ attr['button_name'] }} {% verbatim %}"
             addbuttonclass="{% endverbatim %}{{ attr['button_class'] }} {% verbatim %}"
             addnew="{% endverbatim %}{{ attr['allow_new'] }} {% verbatim %}"
             addnewurl="/geo/putAddress/"
-            no-result-text="Արդյունքներ չեն գտնվել"
+            {% endverbatim %}
+            {% if value is not empty %}
+                {% verbatim %}
+                    init-url="/am/geo/address/{{ geoObj{% endverbatim %}{{ attr['data_id'] }}{% verbatim %}.originalObject.id }}"
+                {% endverbatim %}
+            {% endif %}
+            {% verbatim %}
             inputclass="{% endverbatim %}{{ attr['input_class'] }} {% verbatim %}">
         </yit-autocomplete>
     {% endverbatim %}
