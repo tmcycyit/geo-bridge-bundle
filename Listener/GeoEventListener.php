@@ -9,10 +9,10 @@
 namespace Yit\GeoBridgeBundle\Listener;
 
 use Doctrine\ORM\Event\LifecycleEventArgs;
-use Yit\GeoBridgeBundle\Model\Addressable;
-use Yit\GeoBridgeBundle\Model\Districtable;
+use Yit\GeoBridgeBundle\Model\AddressableInterface;
+use Yit\GeoBridgeBundle\Model\DistrictableInterface;
 use Yit\GeoBridgeBundle\Model\MultiAddressableInterface;
-use Yit\GeoBridgeBundle\Model\Streetable;
+use Yit\GeoBridgeBundle\Model\StreetableInterface;
 use Symfony\Component\DependencyInjection\Container;
 
 /**
