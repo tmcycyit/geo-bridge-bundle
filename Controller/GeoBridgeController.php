@@ -20,13 +20,15 @@ class GeoBridgeController extends Controller
      * This function is used to get address by id
      *
      * @Route("/address/{addressId}", requirements={"addressId" = "\d+"})
-     *
      * @param $addressId
      * @return mixed
      */
     public function getAddress($addressId)
     {
-        return $this->get('yit_geo')->getAddressById($addressId);
+        $address = $this->get('yit_geo')->getAddressById($addressId);
+        $address = json_encode($address);
+
+        return new Response($address);
     }
 
     /**
