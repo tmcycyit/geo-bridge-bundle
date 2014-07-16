@@ -42,12 +42,15 @@ class GeoBridgeController extends Controller
     {
         $addresses = $this->get('yit_geo')->searchAddress($search, self::AUTOCOMPLETE_LIMIT);
 
-        $locale = $this->getRequest()->getLocale();
-        foreach($addresses->data as &$address) {
-            if ($locale == "en") {
-                $address->title = $address->eng_title;
+        if ($addresses)
+        {
+            $locale = $this->getRequest()->getLocale();
+            foreach($addresses->data as &$address) {
+                if ($locale == "en") {
+                    $address->title = $address->eng_title;
+                }
+                unset($address->eng_title);
             }
-            unset($address->eng_title);
         }
 
         $addresses = json_encode($addresses);
