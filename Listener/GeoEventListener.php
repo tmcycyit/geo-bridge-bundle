@@ -11,9 +11,14 @@ namespace Yit\GeoBridgeBundle\Listener;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Yit\GeoBridgeBundle\Model\Addressable;
 use Yit\GeoBridgeBundle\Model\Districtable;
+use Yit\GeoBridgeBundle\Model\MultiAddressableInterface;
 use Yit\GeoBridgeBundle\Model\Streetable;
 use Symfony\Component\DependencyInjection\Container;
 
+/**
+ * Class GeoEventListener
+ * @package Yit\GeoBridgeBundle\Listener
+ */
 class GeoEventListener
 {
     private $container;
@@ -27,8 +32,8 @@ class GeoEventListener
     {
         $entity = $args->getEntity();
 
-
-        if ($entity instanceof Addressable)
+        // inject single address
+        if ($entity instanceof AddressableInterface)
         {
             $address = $this->container->get('yit_geo')->getAddressById($entity->getAddressId());
 
@@ -53,7 +58,22 @@ class GeoEventListener
             }
         }
 
-        if ($entity instanceof Districtable)
+        // inject multi address
+        if ($entity instanceof MultiAddressableInterface)
+        {
+            $addresses = array();
+
+            foreach($entity->getAddressIds() as $id){
+                if($id){
+                    $addresses[$id] = $this->container->get('yit_geo')->getAddressById($id);
+                }
+            }
+
+            $entity->setAddresses($addresses);
+        }
+
+        // inject single district
+        if ($entity instanceof DistrictableInterface)
         {
             $district = $this->container->get('yit_geo')->getDistrictById($entity->getDistrictId());
 
@@ -65,7 +85,8 @@ class GeoEventListener
             }
         }
 
-        if ($entity instanceof Streetable)
+        // inject single street
+        if ($entity instanceof StreetableInterface)
         {
             $street = $this->container->get('yit_geo')->getStreetById($entity->getStreetId());
 

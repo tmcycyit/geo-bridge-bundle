@@ -8,7 +8,7 @@
 
 namespace Yit\GeoBridgeBundle\Model;
 
-interface Streetable
+interface StreetableInterface
 {
     public function getStreetId();
 

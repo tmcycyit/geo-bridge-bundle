@@ -8,7 +8,7 @@
 
 namespace Yit\GeoBridgeBundle\Model;
 
-interface Districtable
+interface DistrictableInterface
 {
     public function getDistrictId();
 

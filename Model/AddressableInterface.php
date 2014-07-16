@@ -8,7 +8,7 @@
 
 namespace Yit\GeoBridgeBundle\Model;
 
-interface Addressable
+interface AddressableInterface
 {
     public function getAddressId();
 
