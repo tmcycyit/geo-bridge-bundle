@@ -67,7 +67,7 @@ Then you can add a new form field`
 ``` php
 $this->createFormBuilder()
              ...
-             ->add('address', 'geo_address', array('attr' => array('data-id' => 1)))
+             ->add('address', 'geo_address', array('attr' => array('data_id' => 1)))
              ...
 ```
 
@@ -79,7 +79,7 @@ $this->createFormBuilder()
              ...
              ->add('address', 'geo_address', array(
                 'attr' => array(
-                    'data-id'       => 1,                   //must be unique for each such field
+                    'data_id'       => 1,                   //must be unique for each such field
                     'placeholder'   => 'text for input',    //placeholder text
                     'allow_new'     => true,                //set true to show new button when address not found
                     'button_name'   => 'buttonName',        //text to show on new button
@@ -90,43 +90,82 @@ $this->createFormBuilder()
 ```
 
 Now the bundle is configured and ready to use, if you need to use in entity address, street or district which will
-a relation with GeoBundle addresses, streets and districts, then you will implements the Addressable, Streetable and
-Districtable interfaces accordingly in your interfaces. And than when you will load your entity from db, GeoBridgeBundle
-will automatically call interface functions with corresponding arguments, to set all necessary information.
+a relation with GeoBundle addresses, streets and districts, then you will implements the AddressableInterface,
+StreetableInterface, MultiAddressableInterface and DistrictableInterface interfaces accordingly in your entites.
+And than when you will load your entity from db, GeoBridgeBundle will automatically call interface functions with
+corresponding arguments, to set all necessary information.
 
 ## The interface implementations here`
 
 ``` php
 namespace Yit\GeoBridgeBundle\Model;
-interface Addressable
+
+//This interface is used when entity has an address_id field
+interface AddressableInterface
 {
+    //This function is used to get address id, the fields of which must be injected
     public function getAddressId();
+
+    //This function is used to inject address title
     public function setAddressTitle($title);
+
+    //This function is used to inject address latitude
     public function setAddresLatitude($latitude);
+
+    //This function is used to inject address longitude
     public function setAddresLongitude($longitude);
+
+    //This function is used to inject address h_number
     public function setAddressHNumber($hNumber);
+
+    //This function is used to inject address eng_type
     public function setAddressEngType($engType);
 }
 
 
 namespace Yit\GeoBridgeBundle\Model;
-interface Districtable
+
+//This interface is used when entity has an district_id field
+interface DistrictableInterface
 {
+    //This function is used to get district id, the fields of which must be injected
     public function getDistrictId();
+
+    //This function is used to inject district title
     public function setDistrictTitle($title);
 }
 
 
 namespace Yit\GeoBridgeBundle\Model;
-interface Streetable
+
+//This interface is used when entity has more than one address
+interface MultiAddressableInterface
 {
+    //This function is used to get ids of addresses that must be injected
+    public function getAddressIds();
+
+    //This function inject addresses
+    public function setAddresses(array $addresses);
+}
+
+
+namespace Yit\GeoBridgeBundle\Model;
+
+//This interface is used when entity has street_id field
+interface StreetableInterface
+{
+    //This function is used to get street id, the fields of which must be injected
     public function getStreetId();
+
+    //This function is used to inject street arm_name
     public function setStreetArmName($armName);
+
+    //This function is used to inject street eng_name
     public function setStreetEngName($engName);
 }
 ```
 
-### You can also use 'geo-bridge' service to use some functions, there are here`
+### You can also use 'yit_geo' service to use some functions, there are here`
 
 ``` php
 //This function return address object by given id
