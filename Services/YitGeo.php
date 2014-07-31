@@ -235,6 +235,29 @@ class YitGeo
 
 
     /**
+     * This function is used get street by given address id
+     * If there are not any address by given id return null
+     *
+     * @param $id
+     * @return mixed|null|string
+     */
+    public function getStreetByAddressId($id)
+    {
+        $street = apc_fetch('address_street_' . $id);
+
+        if ($street === false)
+        {
+            $street = $this->getContent(self::GEO_DOMAIN . '/api/addresses/'. $id .'/street');
+
+            //Store district in cache 24 hours
+            apc_add('address_street_' . $id, $street, 86400);
+        }
+
+        return $street;
+    }
+
+
+    /**
      * This function is used to get $limit streets by $search string
      * If there are not any street with such content return null
      *
