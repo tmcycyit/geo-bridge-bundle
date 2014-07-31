@@ -247,7 +247,7 @@ class YitGeo
 
         if ($street === false)
         {
-            $street = $this->getContent(self::GEO_DOMAIN . '/api/addresses/'. $id .'/street');
+            $street = $this->getContent(self::GEO_DOMAIN . 'api/addresses/'. $id .'/street');
 
             //Store district in cache 24 hours
             apc_add('address_street_' . $id, $street, 86400);
