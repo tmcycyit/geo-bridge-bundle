@@ -32,6 +32,21 @@ class GeoBridgeController extends Controller
     }
 
     /**
+     * This function is used to get address by id
+     *
+     * @Route("/street/{streetId}", requirements={"streetId" = "\d+"})
+     * @param $streetId
+     * @return mixed
+     */
+    public function getStreet($streetId)
+    {
+        $street = $this->get('yit_geo')->getStreetById($streetId);
+        $street = json_encode($street);
+
+        return new Response($street);
+    }
+
+    /**
      * This function is used to generate route for addresses autocomplete
      *
      * @Route("/address/autocomplete/{search}", requirements={"search" = ".+"})
