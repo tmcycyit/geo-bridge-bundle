@@ -76,7 +76,7 @@ class GeoBridgeController extends Controller
     /**
      * This function is used to generate route for street autocomplete
      *
-     * @Route("/street/district/autocomplete/{search}/{district}", requirements={"district" = "\d+"})
+     * @Route("/street/district/autocomplete/{district}/{search}", requirements={"district" = "\d+"})
      * @param $search
      * @param $district
      * @return Response
