@@ -74,6 +74,23 @@ class GeoBridgeController extends Controller
     }
 
     /**
+     * This function is used to generate route for street autocomplete
+     *
+     * @Route("/street/district/autocomplete/{search}/{district}", requirements={"district" = "\d+"})
+     * @param $search
+     * @param $district
+     * @return Response
+     */
+    public function getStreetsByDistrictAction($search, $district)
+    {
+
+        $streets = $this->get('yit_geo')->getSearchStreetsByDistrict($search, $district, self::AUTOCOMPLETE_LIMIT);
+        $streets = json_encode($streets);
+
+        return new Response($streets);
+    }
+
+    /**
      * This function is used to put address on geo project
      * If there are any error return null
      *

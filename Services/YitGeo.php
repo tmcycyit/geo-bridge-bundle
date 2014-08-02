@@ -270,4 +270,21 @@ class YitGeo
         $search = $this->produceUrlParameter($search);
         return $this->getContent(self::GEO_DOMAIN . 'api/streets/'. $search .'/search/' . $limit);
     }
+
+
+    /**
+     * This function is used to get $limit streets by $search string and district id
+     * If there are not any street with such content return null
+     *
+     * @param $search
+     * @param $district
+     * @param int $limit
+     * @return mixed|null|string
+     */
+    public function getSearchStreetsByDistrict($search, $district, $limit = 0)
+    {
+        $limit = ($limit) ? $limit : 10;
+
+        return $this->getContent(self::GEO_DOMAIN . 'api/streets/' . $search . '/search/' . $limit . '/' . $district);
+    }
 }
