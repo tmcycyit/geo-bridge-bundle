@@ -110,6 +110,30 @@ class YitGeo
         return $this->getContent(self::GEO_DOMAIN . "api/addresses/" . $addressString, $context);
     }
 
+    /**
+     * This function is used to create new address in Geo Project with $street, $streetType, $district & $hNumber title
+     * when access return id of created Address else return null
+     *
+     * @param $street
+     * @param $streetType
+     * @param $district
+     * @param $hNumber
+     * @return mixed|null|string
+     */
+    public function putNewAddress($street, $streetType, $district, $hNumber)
+    {
+        $opts = array('http' =>
+                array(
+                        'method'  => 'PUT',
+                        'header'  => "Content-Type: application/json",
+                )
+        );
+        $hNumber = $this->produceUrlParameter($hNumber);
+        $context  = stream_context_create($opts);
+
+        return $this->getContent(self::GEO_DOMAIN . "api/put/addresses/" . $street . "/" . $streetType . "/" . $district . "/" . $hNumber, $context);
+    }
+
     //******************************************
     //************** District ******************
     //******************************************
@@ -206,6 +230,18 @@ class YitGeo
         return $streets;
     }
 
+
+    /**
+     * This function is used to get district by $search string
+     * If there are not any district with such content return null
+     *
+     * @param $search
+     * @return mixed|null|string
+     */
+    public function searchDistrict($search)
+    {
+        return $this->getContent(self::GEO_DOMAIN . 'api/districts/'. $search .'/search');
+    }
 
     //******************************************
     //**************** Street ******************

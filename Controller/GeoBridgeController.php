@@ -47,6 +47,21 @@ class GeoBridgeController extends Controller
     }
 
     /**
+     * This function is used to get district by id
+     *
+     * @Route("/district/{districtId}", requirements={"districtId" = "\d+"})
+     * @param $districtId
+     * @return mixed
+     */
+    public function getDistrictById($districtId)
+    {
+        $district = $this->get('yit_geo')->getDistrictById($districtId);
+        $district = json_encode($district);
+
+        return new Response($district);
+    }
+
+    /**
      * This function is used to generate route for addresses autocomplete
      *
      * @Route("/address/autocomplete/{search}", requirements={"search" = ".+"})
@@ -86,6 +101,21 @@ class GeoBridgeController extends Controller
         $streets = json_encode($streets);
 
         return new Response($streets);
+    }
+
+    /**
+     * This function is used to generate route for street autocomplete
+     *
+     * @Route("/district/autocomplete/{search}")
+     * @param $search
+     * @return Response
+     */
+    public function getDistrictAction($search)
+    {
+        $district = $this->get('yit_geo')->searchDistrict($search);
+        $district = json_encode($district);
+
+        return new Response($district);
     }
 
     /**
