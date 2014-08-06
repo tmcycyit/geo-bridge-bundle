@@ -129,6 +129,7 @@ class YitGeo
                 )
         );
         $hNumber = $this->produceUrlParameter($hNumber);
+        $street = $this->produceUrlParameter($street);
         $context  = stream_context_create($opts);
 
         return $this->getContent(self::GEO_DOMAIN . "api/put/addresses/" . $street . "/" . $streetType . "/" . $district . "/" . $hNumber, $context);
