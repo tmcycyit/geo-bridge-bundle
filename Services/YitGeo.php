@@ -128,11 +128,31 @@ class YitGeo
                         'header'  => "Content-Type: application/json",
                 )
         );
+        $streetType = $streetType ? $streetType : 'փողոց';
+        $hNumber = $hNumber ? $hNumber : 0;
         $hNumber = $this->produceUrlParameter($hNumber);
         $street = $this->produceUrlParameter($street);
         $context  = stream_context_create($opts);
 
         return $this->getContent(self::GEO_DOMAIN . "api/put/addresses/" . $street . "/" . $streetType . "/" . $district . "/" . $hNumber, $context);
+    }
+
+    /**
+     * This function is used to get addresses by $street, $type and $hNumber string
+     * If there are not any address with such content return null
+     *
+     * @param $street
+     * @param $type
+     * @param $hNumber
+     * @return mixed|null|string
+     */
+    public function findAddress($street, $type, $hNumber)
+    {
+        $type = $type ? $type : 'փողոց';
+        $hNumber = $hNumber ? $hNumber : 0;
+        $street = $this->produceUrlParameter($street);
+        $hNumber = $this->produceUrlParameter($hNumber);
+        return $this->getContent(self::GEO_DOMAIN . 'api/param/addresses/' . $street . '/' . $type . '/' . $hNumber);
     }
 
     //******************************************
