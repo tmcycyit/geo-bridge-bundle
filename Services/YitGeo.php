@@ -10,7 +10,7 @@ namespace Yit\GeoBridgeBundle\Services;
 
 class YitGeo
 {
-    const GEO_DOMAIN = 'http://geo.yerevan.am/';
+    const GEO_DOMAIN = 'http://geoproject.loc/app_dev.php/';
 
     /**
      * This function is used to get content from $link
@@ -87,6 +87,20 @@ class YitGeo
     {
         $search = $this->produceUrlParameter($search);
         return $this->getContent(self::GEO_DOMAIN . 'api/addresses/'. $search .'/search/' . $limit);
+    }
+
+    /**
+     * This function is used to get $limit streets or addresses by $search string
+     * If there are not any address with such content return null
+     *
+     * @param $search
+     * @param int $limit
+     * @return mixed|null|string
+     */
+    public function searchFlexibleAddress($search, $limit = 0)
+    {
+        $search = $this->produceUrlParameter($search);
+        return $this->getContent(self::GEO_DOMAIN . 'api/flexible/addresses/'. $search .'/search/' . $limit);
     }
 
     /**

@@ -88,6 +88,34 @@ class GeoBridgeController extends Controller
         return new Response($addresses);
     }
 
+
+    /**
+     * This function is used to generate route for addresses autocomplete
+     *
+     * @Route("/flexible/address/autocomplete/{search}", requirements={"search" = ".+"})
+     * @param $search
+     * @return Response
+     */
+    public function getAddressesFlexibleAction($search)
+    {
+        $result = $this->get('yit_geo')->searchFlexibleAddress($search, self::AUTOCOMPLETE_LIMIT);
+
+        if ($result)
+        {
+            $locale = $this->getRequest()->getLocale();
+            foreach($result->data as &$address) {
+                if ($locale == "en") {
+                    $address->title = $address->eng_title;
+                }
+                unset($address->eng_title);
+            }
+        }
+
+        $result = json_encode($result);
+
+        return new Response($result);
+    }
+
     /**
      * This function is used to generate route for street autocomplete
      *
