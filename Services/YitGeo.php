@@ -10,7 +10,7 @@ namespace Yit\GeoBridgeBundle\Services;
 
 class YitGeo
 {
-    const GEO_DOMAIN = 'http://geoproject.loc/app_dev.php/';
+    const GEO_DOMAIN = 'http://dev.geo.yerevan.am/';
 
     /**
      * This function is used to get content from $link
