@@ -8,9 +8,22 @@
 
 namespace Yit\GeoBridgeBundle\Services;
 
+use Symfony\Component\DependencyInjection\Container;
+
 class YitGeo
 {
-    const GEO_DOMAIN = 'http://dev.geo.yerevan.am/';
+    const GEO_DOMAIN = 'http://geoproject.loc/app_dev.php/';
+
+    protected $experience;
+
+    protected $container;
+
+    public function __construct(Container $container)
+    {
+        $this->container = $container;
+        $this->experience = $this->container->getParameter('yit_geo_bridge.experience');
+    }
+
 
     /**
      * This function is used to get content from $link
@@ -69,7 +82,7 @@ class YitGeo
         {
             $address = $this->getContent(self::GEO_DOMAIN . 'api/addresses/' . $id);
             //Store address in cache 24 hours
-            apc_add('address_' . $id, $address, 86400);
+            apc_add('address_' . $id, $address, $this->experience);
         }
 
         return $address;
@@ -115,8 +128,10 @@ class YitGeo
         $opts = array('http' =>
                 array(
                         'method'  => 'PUT',
-                        'header'  => "Content-Type: application/json",
-                )
+                        'content' => http_build_query(array(
+                            'project_name'  => $this->container->getParameter('yit_geo_bridge.project_name'),
+                            'author'        => $this->container->get('security.context')->getToken()->getUser()->getUserName(),
+                )))
         );
         $addressString = $this->produceUrlParameter($addressString);
         $context  = stream_context_create($opts);
@@ -188,7 +203,7 @@ class YitGeo
         {
             $district = $this->getContent(self::GEO_DOMAIN . 'api/districts/' . $id);
             //Store district in cache 24 hours
-            apc_add('district_' . $id, $district, 86400);
+            apc_add('district_' . $id, $district, $this->experience);
         }
 
         return $district;
@@ -209,7 +224,7 @@ class YitGeo
         {
             $districts = $this->getContent(self::GEO_DOMAIN . 'api/districts');
             //Store districts in cache 24 hours
-            apc_add('districts', $districts, 86400);
+            apc_add('districts', $districts, $this->experience);
         }
 
         return $districts;
@@ -237,7 +252,7 @@ class YitGeo
             }
 
             //Store districtList in cache 24 hours
-            apc_add('districtsList', $districtsList, 86400);
+            apc_add('districtsList', $districtsList, $this->experience);
         }
 
         return $districtsList;
@@ -259,7 +274,7 @@ class YitGeo
             $streets = $this->getContent(self::GEO_DOMAIN . 'api/districts/' . $districtID . '/streets');
 
             //Store streets in cache 24 hours
-            apc_add('district_streets', $streets, 86400);
+            apc_add('district_streets', $streets, $this->experience);
         }
 
         return $streets;
@@ -298,7 +313,7 @@ class YitGeo
             $street = $this->getContent(self::GEO_DOMAIN . 'api/streets/' . $id);
 
             //Store district in cache 24 hours
-            apc_add('street_' . $id, $street, 86400);
+            apc_add('street_' . $id, $street, $this->experience);
         }
 
         return $street;
@@ -321,7 +336,7 @@ class YitGeo
             $street = $this->getContent(self::GEO_DOMAIN . 'api/addresses/'. $id .'/street');
 
             //Store district in cache 24 hours
-            apc_add('address_street_' . $id, $street, 86400);
+            apc_add('address_street_' . $id, $street, $this->experience);
         }
 
         return $street;

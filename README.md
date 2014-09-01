@@ -205,4 +205,22 @@ public function getStreetById($id)
 public function searchStreet($search, $limit = 0)
 ```
 
+The bundle use apc_cache and by default save addresses in the cache during 24 hours,
+you can change the time of experience by add the fallowing in your config.yml
+
+```yml
+yit_geo_bridge:
+    experience: experience_time_in_seconds
+```
+
+You can also add project name in the config to save it in the geo project, this
+done by add the following in the config.yml
+
+```yml
+yit_geo_bridge:
+    project_name: your_project_name
+```
+
+
+
 

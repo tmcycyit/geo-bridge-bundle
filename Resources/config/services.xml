@@ -4,6 +4,11 @@
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
+    <parameters>
+        <parameter key="yit_geo_bridge.experience">%yit_geo_bridge_experience%</parameter>
+        <parameter key="yit_geo_bridge.project_name">%yit_geo_bridge_project_name%</parameter>
+    </parameters>
+
     <services>
 
         <service id="geo.event.listener" class="Yit\GeoBridgeBundle\Listener\GeoEventListener">
@@ -12,6 +17,7 @@
         </service>
 
         <service id="yit_geo" class="Yit\GeoBridgeBundle\Services\YitGeo">
+            <argument type="service" id="service_container" />
         </service>
 
         <service id="geo.form.type.geo_address" class="Yit\GeoBridgeBundle\Form\Type\GeoAddressType">

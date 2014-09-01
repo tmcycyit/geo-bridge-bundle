@@ -24,5 +24,18 @@ class YitGeoBridgeExtension extends Extension
 
         $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.xml');
+
+        if (isset($config) && isset($config['experience'])) {
+            $container->setParameter($this->getAlias() . '.experience', $config['experience']);
+        }
+        else {
+            $container->setParameter($this->getAlias() . '.experience', 86400);
+        }
+        if (isset($config) && isset($config['project_name'])) {
+            $container->setParameter($this->getAlias() . '.project_name', $config['project_name']);
+        }
+        else {
+            $container->setParameter($this->getAlias() . '.project_name', 'geo_bridge');
+        }
     }
 }
