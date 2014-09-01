@@ -39,5 +39,4 @@ interface AddressDistrictableInterface
      * @return mixed
      */
     public function getDistrictId();
-
 }

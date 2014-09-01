@@ -73,6 +73,20 @@ class GeoEventListener
             $entity->setAddresses($addresses);
         }
 
+        if ($entity instanceof AddressDistrictableInterface)
+        {
+            if (!$entity->getDistrictId() and $entity->getAddressId())
+            {
+                $address = $this->container->get('yit_geo')->getAddressById($entity->getAddressId());
+                if (isset($address->street_district) && isset($address->street_district->district)){
+                    $entity->setDistrictId($address->street_district->district->id);
+                    $em = $this->container->get('doctrine')->getManager();
+                    $em->persist($entity);
+                    $em->flush();
+                }
+            }
+        }
+
         // inject single district
         if ($entity instanceof DistrictableInterface)
         {
@@ -101,14 +115,5 @@ class GeoEventListener
                 }
             }
         }
-
-        if ($entity instanceof AddressDistrictableInterface)
-        {
-            if (!$entity->getDistrictId() and $entity->getAddressId())
-            {
-                $address = $this->container->get('yit_geo')->getAddressById($entity->getAddressId());
-            }
-        }
-
     }
 }

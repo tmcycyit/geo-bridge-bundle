@@ -163,6 +163,23 @@ interface StreetableInterface
     //This function is used to inject street eng_name
     public function setStreetEngName($engName);
 }
+
+
+namespace Yit\GeoBridgeBundle\Model;
+
+//This interface is used when entity has an address_id and district_id
+//fields to set district id based on address id
+interface AddressDistrictableInterface
+{
+    //This function is used to get address id
+    public function getAddressId();
+
+    //This function is used to inject district id
+    public function setDistrictId($id);
+
+    //This function is used to get district id
+    public function getDistrictId();
+}
 ```
 
 ### You can also use 'yit_geo' service to use some functions, there are here`
