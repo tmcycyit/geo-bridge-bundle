@@ -10,6 +10,7 @@ namespace Yit\GeoBridgeBundle\Listener;
 
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Yit\GeoBridgeBundle\Model\AddressableInterface;
+use Yit\GeoBridgeBundle\Model\AddressDistrictableInterface;
 use Yit\GeoBridgeBundle\Model\DistrictableInterface;
 use Yit\GeoBridgeBundle\Model\MultiAddressableInterface;
 use Yit\GeoBridgeBundle\Model\StreetableInterface;
@@ -98,6 +99,14 @@ class GeoEventListener
                 if (isset($street->eng_name)) {
                     $entity->setStreetEngName($street->eng_name);
                 }
+            }
+        }
+
+        if ($entity instanceof AddressDistrictableInterface)
+        {
+            if (!$entity->getDistrictId() and $entity->getAddressId())
+            {
+                $address = $this->container->get('yit_geo')->getAddressById($entity->getAddressId());
             }
         }
 
