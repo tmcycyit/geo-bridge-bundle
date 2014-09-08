@@ -75,14 +75,21 @@ class GeoEventListener
 
         if ($entity instanceof AddressDistrictableInterface)
         {
-            if (!$entity->getDistrictId() and $entity->getAddressId())
+            if ($entity->getAddressId())
             {
+                $isNull = is_null($entity->getDistrictId());
+
                 $address = $this->container->get('yit_geo')->getAddressById($entity->getAddressId());
-                if (isset($address->street_district) && isset($address->street_district->district)){
+                if (isset($address->street_district) && isset($address->street_district->district) &&
+                        $address->street_district->district->id != $entity->getDistrictId())
+                {
                     $entity->setDistrictId($address->street_district->district->id);
-                    $em = $this->container->get('doctrine')->getManager();
-                    $em->persist($entity);
-                    $em->flush();
+
+                    if ($isNull) {
+                        $em = $this->container->get('doctrine')->getManager();
+                        $em->persist($entity);
+                        $em->flush();
+                    }
                 }
             }
         }
