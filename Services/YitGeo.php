@@ -12,7 +12,7 @@ use Symfony\Component\DependencyInjection\Container;
 
 class YitGeo
 {
-    const GEO_DOMAIN = 'http://dev.geo.yerevan.am/';
+    const GEO_DOMAIN = 'http://geoproject.loc/app_dev.php/';
 
     protected $experience;
 
@@ -125,12 +125,20 @@ class YitGeo
      */
     public function putAddress($addressString)
     {
+        $token = $this->container->get('security.context')->getToken();
+        if ($token) {
+            $user = $token->getUser()->getUserName();
+        }
+        else {
+            $user = 'Geo_Bridge';
+        }
+
         $opts = array('http' =>
                 array(
                         'method'  => 'PUT',
                         'content' => http_build_query(array(
                             'project_name'  => $this->container->getParameter('yit_geo_bridge.project_name'),
-                            'author'        => $this->container->get('security.context')->getToken()->getUser()->getUserName(),
+                            'author'        => $user,
                 )))
         );
         $addressString = $this->produceUrlParameter($addressString);
