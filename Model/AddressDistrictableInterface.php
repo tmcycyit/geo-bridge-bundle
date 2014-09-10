@@ -13,6 +13,7 @@ namespace Yit\GeoBridgeBundle\Model;
  *
  * This interface is used when entity has an address_id and district_id
  * fields to set district id based on address id
+ * district id is set from geo project, and if it is empty persist it
  *
  * @package Yit\GeoBridgeBundle\Model
  */

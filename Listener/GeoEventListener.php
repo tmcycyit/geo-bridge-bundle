@@ -11,6 +11,9 @@ namespace Yit\GeoBridgeBundle\Listener;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Yit\GeoBridgeBundle\Model\AddressableInterface;
 use Yit\GeoBridgeBundle\Model\AddressDistrictableInterface;
+use Yit\GeoBridgeBundle\Model\AddressDistrictableInterfaceToShow;
+use Yit\GeoBridgeBundle\Model\AddressStreetableInterface;
+use Yit\GeoBridgeBundle\Model\AddressStreetableInterfaceToShow;
 use Yit\GeoBridgeBundle\Model\DistrictableInterface;
 use Yit\GeoBridgeBundle\Model\MultiAddressableInterface;
 use Yit\GeoBridgeBundle\Model\StreetableInterface;
@@ -32,6 +35,10 @@ class GeoEventListener
     public function postLoad(LifecycleEventArgs $args)
     {
         $entity = $args->getEntity();
+
+        //=========================================================================
+        //============================ Addresses ==================================
+        //=========================================================================
 
         // inject single address
         if ($entity instanceof AddressableInterface)
@@ -73,6 +80,10 @@ class GeoEventListener
             $entity->setAddresses($addresses);
         }
 
+        //=========================================================================
+        //============================ Districts ==================================
+        //=========================================================================
+
         if ($entity instanceof AddressDistrictableInterface)
         {
             if ($entity->getAddressId())
@@ -83,7 +94,11 @@ class GeoEventListener
                 if (isset($address->street_district) && isset($address->street_district->district) &&
                         $address->street_district->district->id != $entity->getDistrictId())
                 {
-                    $entity->setDistrictId($address->street_district->district->id);
+                    //If $entity has not district_id or if it has but it implements AddressDistrictableInterfaceToShow
+                    //interface add district_id to it
+                    if (!$entity->getDistrictId() || $entity instanceof AddressDistrictableInterfaceToShow) {
+                        $entity->setDistrictId($address->street_district->district->id);
+                    }
 
                     if ($isNull) {
                         $em = $this->container->get('doctrine')->getManager();
@@ -106,6 +121,36 @@ class GeoEventListener
                 }
             }
         }
+
+        //=========================================================================
+        //============================== Streets ==================================
+        //=========================================================================
+
+        if ($entity instanceof AddressStreetableInterface)
+        {
+            if ($entity->getAddressId())
+            {
+                $isNull = is_null($entity->getStreetId());
+
+                $address = $this->container->get('yit_geo')->getAddressById($entity->getAddressId());
+                if (isset($address->street_district) && isset($address->street_district->street) &&
+                        $address->street_district->street->id != $entity->getStreetId())
+                {
+                    //If $entity has not street_id or if it has but it implements AddressStreetableInterfaceToShow
+                    //interface add street_id to it
+                    if (!$entity->getStreetId() || $entity instanceof AddressStreetableInterfaceToShow) {
+                        $entity->setStreetId($address->street_district->street->id);
+                    }
+
+                    if ($isNull) {
+                        $em = $this->container->get('doctrine')->getManager();
+                        $em->persist($entity);
+                        $em->flush();
+                    }
+                }
+            }
+        }
+
 
         // inject single street
         if ($entity instanceof StreetableInterface)
