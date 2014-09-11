@@ -12,7 +12,8 @@ use Symfony\Component\DependencyInjection\Container;
 
 class YitGeo
 {
-    const GEO_DOMAIN = 'http://dev.geo.yerevan.am/';
+//    const GEO_DOMAIN = 'http://dev.geo.yerevan.am/';
+    const GEO_DOMAIN = 'http://geo.loc/app_dev.php/';
 
     protected $experience;
 
@@ -134,11 +135,11 @@ class YitGeo
         }
 
         $opts = array('http' =>
-                array(
-                        'method'  => 'PUT',
-                        'content' => http_build_query(array(
-                            'project_name'  => $this->container->getParameter('yit_geo_bridge.project_name'),
-                            'author'        => $user,
+            array(
+                'method'  => 'PUT',
+                'content' => http_build_query(array(
+                    'project_name'  => $this->container->getParameter('yit_geo_bridge.project_name'),
+                    'author'        => $user,
                 )))
         );
         $addressString = $this->produceUrlParameter($addressString);
@@ -160,10 +161,10 @@ class YitGeo
     public function putNewAddress($street, $streetType, $district, $hNumber)
     {
         $opts = array('http' =>
-                array(
-                        'method'  => 'PUT',
-                        'header'  => "Content-Type: application/json",
-                )
+            array(
+                'method'  => 'PUT',
+                'header'  => "Content-Type: application/json",
+            )
         );
         $streetType = $streetType ? $streetType : 'փողոց';
         $hNumber = $hNumber ? $hNumber : 0;
@@ -363,6 +364,20 @@ class YitGeo
     {
         $search = $this->produceUrlParameter($search);
         return $this->getContent(self::GEO_DOMAIN . 'api/streets/'. $search .'/search/' . $limit);
+    }
+
+    /**
+     * This function is used to get $limit streets by $search string
+     * If there are not any street with such content return null
+     *
+     * @param $search
+     * @param int $limit
+     * @return mixed|null|string
+     */
+    public function searchStreetFlexible($search, $limit = 0)
+    {
+        $search = $this->produceUrlParameter($search);
+        return $this->getContent(self::GEO_DOMAIN . 'api/flexible/streets/'. $search .'/search/' . $limit);
     }
 
 

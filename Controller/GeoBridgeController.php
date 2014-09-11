@@ -103,11 +103,11 @@ class GeoBridgeController extends Controller
         if ($result)
         {
             $locale = $this->getRequest()->getLocale();
-            foreach($result->data as &$address) {
-                if ($locale == "en") {
+            if ($locale == "en") {
+                foreach($result->data as &$address) {
                     $address->title = $address->eng_title;
+                    unset($address->eng_title);
                 }
-                unset($address->eng_title);
             }
         }
 
@@ -129,6 +129,32 @@ class GeoBridgeController extends Controller
         $streets = json_encode($streets);
 
         return new Response($streets);
+    }
+
+    /**
+     * This function is used to get districts or streets for flexible autocomplete
+     *
+     * @Route("/flexible/street/autocomplete/{search}", requirements={"search" = ".+"})
+     * @param $search
+     * @return Response
+     */
+    public function getStreetsFlexibleAction($search)
+    {
+        $result = $this->get('yit_geo')->searchStreetFlexible($search, self::AUTOCOMPLETE_LIMIT);
+
+        if ($result) {
+            $locale = $this->getRequest()->getLocale();
+            if($locale == "en") {
+                foreach($result->data as &$data) {
+                    $data->title = $data->eng_title;
+                    unset($data->eng_title);
+                }
+            }
+        }
+
+        $result = json_encode($result);
+
+        return new Response($result);
     }
 
     /**
