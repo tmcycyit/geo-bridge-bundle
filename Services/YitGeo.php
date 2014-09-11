@@ -12,8 +12,8 @@ use Symfony\Component\DependencyInjection\Container;
 
 class YitGeo
 {
-//    const GEO_DOMAIN = 'http://dev.geo.yerevan.am/';
-    const GEO_DOMAIN = 'http://geo.loc/app_dev.php/';
+    const GEO_DOMAIN = 'http://dev.geo.yerevan.am/';
+//    const GEO_DOMAIN = 'http://geo.loc/app_dev.php/';
 
     protected $experience;
 
