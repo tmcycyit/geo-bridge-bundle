@@ -299,6 +299,7 @@ class YitGeo
      */
     public function searchDistrict($search)
     {
+        $search = $this->produceUrlParameter($search);
         return $this->getContent(self::GEO_DOMAIN . 'api/districts/'. $search .'/search');
     }
 
