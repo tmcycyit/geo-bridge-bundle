@@ -102,8 +102,10 @@ class GeoEventListener
 
                     if ($isNull) {
                         $em = $this->container->get('doctrine')->getManager();
-                        $em->persist($entity);
-                        $em->flush();
+                        $query = $em->createQuery("UPDATE ". get_class($entity). " a  SET a."
+                                    . $entity->getDistrictFieldName() ." = "
+                                    . $address->street_district->district->id. " WHERE a.id =  " . $entity->getId());
+                        $query->execute();
                     }
                 }
             }
@@ -144,8 +146,10 @@ class GeoEventListener
 
                     if ($isNull) {
                         $em = $this->container->get('doctrine')->getManager();
-                        $em->persist($entity);
-                        $em->flush();
+                        $query = $em->createQuery("UPDATE ". get_class($entity). " a  SET a."
+                                    . $entity->getStreetFieldName() ." = "
+                                    . $address->street_district->street->id. " WHERE a.id =  " . $entity->getId());
+                        $query->execute();
                     }
                 }
             }

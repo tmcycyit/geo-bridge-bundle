@@ -40,4 +40,11 @@ interface AddressStreetableInterface
      * @return mixed
      */
     public function getStreetId();
+
+    /**
+     * This function is used to get streetId field name
+     *
+     * @return mixed
+     */
+    public function getStreetFieldName();
 }

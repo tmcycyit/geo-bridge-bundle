@@ -40,4 +40,11 @@ interface AddressDistrictableInterface
      * @return mixed
      */
     public function getDistrictId();
+
+    /**
+     * This function is used to set districtId field name
+     *
+     * @return mixed
+     */
+    public function getDistrictFieldName();
 }
