@@ -10,10 +10,11 @@ namespace Yit\GeoBridgeBundle\Listener;
 
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Yit\GeoBridgeBundle\Model\AddressableInterface;
+use Yit\GeoBridgeBundle\Model\AddressChangeableInterface;
 use Yit\GeoBridgeBundle\Model\AddressDistrictableInterface;
 use Yit\GeoBridgeBundle\Model\AddressDistrictableInterfaceToShow;
 use Yit\GeoBridgeBundle\Model\AddressStreetableInterface;
-use Yit\GeoBridgeBundle\Model\AddressStreetableInterfaceToShow;
+use Yit\GeoBridgeBundle\Model\AddressStreetableInterfaceToChange;
 use Yit\GeoBridgeBundle\Model\DistrictableInterface;
 use Yit\GeoBridgeBundle\Model\MultiAddressableInterface;
 use Yit\GeoBridgeBundle\Model\StreetableInterface;
@@ -39,6 +40,20 @@ class GeoEventListener
         //=========================================================================
         //============================ Addresses ==================================
         //=========================================================================
+
+        if ($entity instanceof AddressChangeableInterface)
+        {
+            $address = $this->container->get('yit_geo')->getAddressById($entity->getAddressId());
+
+            if ($address && $address->id != $entity->getAddressId())
+            {
+                $em = $this->container->get('doctrine')->getManager();
+                $query = $em->createQuery("UPDATE ". get_class($entity). " a  SET a."
+                    . $entity->getAddressField() ." = "
+                    . $address->id. " WHERE a.id =  " . $entity->getId());
+                $query->execute();
+            }
+        }
 
         // inject single address
         if ($entity instanceof AddressableInterface)
@@ -135,13 +150,15 @@ class GeoEventListener
                 $isNull = is_null($entity->getStreetId());
 
                 $address = $this->container->get('yit_geo')->getAddressById($entity->getAddressId());
+
                 if (isset($address->street_district) && isset($address->street_district->street) &&
                         $address->street_district->street->id != $entity->getStreetId())
                 {
                     //If $entity has not street_id or if it has but it implements AddressStreetableInterfaceToShow
                     //interface add street_id to it
-                    if (!$entity->getStreetId() || $entity instanceof AddressStreetableInterfaceToShow) {
+                    if (!$entity->getStreetId() || $entity instanceof AddressStreetableInterfaceToChange) {
                         $entity->setStreetId($address->street_district->street->id);
+                        $isNull = true;
                     }
 
                     if ($isNull) {
