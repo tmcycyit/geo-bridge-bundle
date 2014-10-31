@@ -118,6 +118,26 @@ class YitGeo
     }
 
     /**
+     * This function is used to get addresses by given id's array
+     *
+     * @param array $ids
+     * @return mixed|null|string
+     */
+    public function getAddresses(array $ids)
+    {
+        $opts = array('http' =>
+            array(
+                'method'  => 'POST',
+                'content' => json_encode($ids)
+            )
+        );
+
+        $context  = stream_context_create($opts);
+
+        return $this->getContent(self::GEO_DOMAIN . "api/addresses/multiples", $context);
+    }
+
+    /**
      * This function is used to create new address in Geo Project with $addressString title
      * when access return id of created Address else return null
      *
