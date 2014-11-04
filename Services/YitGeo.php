@@ -90,6 +90,17 @@ class YitGeo
     }
 
     /**
+     * This function is used get address synonym ids
+     *
+     * @param $addressId
+     * @return mixed|null|string
+     */
+    public function getSynonymIds($addressId)
+    {
+        return $this->getContent(self::GEO_DOMAIN . 'api/addresses/'. $addressId .'/synonyms');
+    }
+
+    /**
      * This function is used to get $limit addresses by $search string
      * If there are not any address with such content return null
      *
