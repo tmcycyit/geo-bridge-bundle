@@ -95,12 +95,13 @@ class YitGeo
      *
      * @param $search
      * @param int $limit
+     * @param $districtId
      * @return mixed|null|string
      */
-    public function searchAddress($search, $limit = 0)
+    public function searchAddress($search, $limit = 0, $districtId = 0)
     {
         $search = $this->produceUrlParameter($search);
-        return $this->getContent(self::GEO_DOMAIN . 'api/addresses/'. $search .'/search/' . $limit);
+        return $this->getContent(self::GEO_DOMAIN . 'api/addresses/'. $search .'/search/' . $limit . '/' .  $districtId);
     }
 
     /**

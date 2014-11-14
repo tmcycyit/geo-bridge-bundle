@@ -65,12 +65,14 @@ class GeoBridgeController extends Controller
      * This function is used to generate route for addresses autocomplete
      *
      * @Route("/address/autocomplete/{search}", requirements={"search" = ".+"})
+     * @Route("/address/district/autocomplete/{districtId}/{search}", requirements={"search" = ".+"})
      * @param $search
+     * @param $districtId
      * @return Response
      */
-    public function getAddressesAction($search)
+    public function getAddressesAction($search, $districtId = 0)
     {
-        $addresses = $this->get('yit_geo')->searchAddress($search, self::AUTOCOMPLETE_LIMIT);
+        $addresses = $this->get('yit_geo')->searchAddress($search, self::AUTOCOMPLETE_LIMIT, $districtId);
 
         if ($addresses)
         {
