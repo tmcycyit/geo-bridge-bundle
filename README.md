@@ -254,13 +254,31 @@ interface AddressStreetableInterfaceToChange extends AddressStreetableInterface
 //If there are not any address with such id return null
 public function getAddressById($id)
 
+//This function is used get address synonym ids
+public function getSynonymIds($addressId)
+
 //This function is used to get $limit addresses by $search string
 //If there are not any address with such content return null
 public function searchAddress($search, $limit = 0)
 
+//This function is used to get $limit streets or addresses by $search string
+//If there are not any address with such content return null
+public function searchFlexibleAddress($search, $limit = 0)
+
 //This function is used to create new address in Geo Project with $addressString title
 //when access return id of created Address else return null
 public function putAddress($addressString)
+
+//This function is used to get addresses by given id's array
+public function getAddresses(array $ids)
+
+//This function is used to create new address in Geo Project with $street, $streetType, $district & $hNumber title
+//when access return id of created Address else return null
+public function putNewAddress($street, $streetType, $district, $hNumber)
+
+//This function is used to get addresses by $street, $type and $hNumber string
+//If there are not any address with such content return null
+public function findAddress($street, $type, $hNumber)
 
 //This function return district object by given id
 //If there are not any district with such id return null
@@ -278,13 +296,29 @@ public function getDistrictList()
 //If there are not any street return null
 public function getStreetsByDistrict($districtID)
 
+//This function is used to get district by $search string
+//If there are not any district with such content return null
+public function searchDistrict($search)
+
 //This function is used get street by given id
 //If there are not any street by given id return null
 public function getStreetById($id)
 
+//This function is used get street by given address id
+//If there are not any address by given id return null
+public function getStreetByAddressId($id)
+
 //This function is used to get $limit streets by $search string
 //If there are not any street with such content return null
 public function searchStreet($search, $limit = 0)
+
+//This function is used to get $limit streets by $search string
+//If there are not any street with such content return null
+public function searchStreetFlexible($search, $limit = 0)
+
+//This function is used to get $limit streets by $search string and district id
+//If there are not any street with such content return null
+public function getSearchStreetsByDistrict($search, $district, $limit = 0)
 ```
 
 The bundle use apc_cache and by default save addresses in the cache during 24 hours,
