@@ -91,7 +91,7 @@ $this->createFormBuilder()
 
 Now the bundle is configured and ready to use, if you need to use in entity address, street or district which will
 a relation with GeoBundle addresses, streets and districts, then you will implements the AddressableInterface,
-StreetableInterface, MultiAddressableInterface and DistrictableInterface interfaces accordingly in your entites.
+StreetableInterface, MultiAddressableInterface, DistrictableInterface and other interfaces accordingly in your entites.
 And than when you will load your entity from db, GeoBridgeBundle will automatically call interface functions with
 corresponding arguments, to set all necessary information.
 
@@ -179,6 +179,71 @@ interface AddressDistrictableInterface
 
     //This function is used to get district id
     public function getDistrictId();
+}
+
+
+namespace Yit\GeoBridgeBundle\Model;
+
+//This interface is used to change address_id field
+interface AddressChangeableInterface
+{
+    //This function is used to get address id, the fields of which must be injected
+    public function getAddressId();
+
+    //This function is used to set Address Id
+    public function setAddressId($addressId);
+
+    //This function is used to get AddressId field name
+    public function getAddressField();
+}
+
+
+namespace Yit\GeoBridgeBundle\Model;
+
+/**
+ * This interface is used when entity has an address_id and district_id
+ * fields to set district id based on address id
+ * district id is set from geo project, and if it is empty persist it, if does not match only set district id without persist
+ */
+interface AddressDistrictableInterfaceToShow extends AddressDistrictableInterface
+{
+
+}
+
+
+namespace Yit\GeoBridgeBundle\Model;
+
+/**
+ * This interface is used when entity has an address_id and street_id
+ * fields to set street id based on address id
+ * street id is set from geo project and persist it is empty
+ */
+interface AddressStreetableInterface
+{
+    //This function is used to get address id
+    public function getAddressId();
+
+    //This function is used to inject street id
+    public function setStreetId($id);
+
+    //This function is used to get street id
+    public function getStreetId();
+
+    //This function is used to get streetId field name
+    public function getStreetFieldName();
+}
+
+
+namespace Yit\GeoBridgeBundle\Model;
+
+/**
+ * This interface is used when entity has an address_id and street_id
+ * fields to set street id based on address id
+ * street id is set from geo project and persist it is empty, if does not match only set street id without persist
+ */
+interface AddressStreetableInterfaceToChange extends AddressStreetableInterface
+{
+
 }
 ```
 
