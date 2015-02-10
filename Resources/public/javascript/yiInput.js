@@ -11,7 +11,7 @@ angular.module("Geo")
                     $parse(attrs.ngModel).assign(scope, val);
                 }
                 scope.$watch(attrs.ngModel,function(d){
-                    angular.element("#"+attrs.id).val(d);
+                    element.attr('value',d);
                 },true);
             }
         };
