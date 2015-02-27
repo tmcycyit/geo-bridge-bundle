@@ -172,7 +172,6 @@ class GeoEventListener
             }
         }
 
-
         // inject single street
         if ($entity instanceof StreetableInterface)
         {
