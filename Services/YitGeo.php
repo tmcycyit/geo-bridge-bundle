@@ -115,6 +115,21 @@ class YitGeo
         return $this->getContent(self::GEO_DOMAIN . 'api/addresses/'. $search .'/search/' . $limit . '/' .  $districtId);
     }
 
+	/**
+     * This function is used to get $limit active and in Yerevan addresses by $search string
+     * If there are not any address with such content return null
+     *
+     * @param $search
+     * @param int $limit
+     * @param $districtId
+     * @return mixed|null|string
+     */
+    public function searchActiveAddress($search, $limit = 0, $districtId = 0)
+    {
+        $search = $this->produceUrlParameter($search);
+        return $this->getContent(self::GEO_DOMAIN . 'api/active/addresses/'. $search .'/search/' . $limit . '/' .  $districtId);
+    }
+
     /**
      * This function is used to get $limit streets or addresses by $search string
      * If there are not any address with such content return null
