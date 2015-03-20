@@ -1,5 +1,6 @@
 <?php
 
+
 namespace Yit\GeoBridgeBundle\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
