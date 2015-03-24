@@ -10,6 +10,7 @@ namespace Yit\GeoBridgeBundle\Services;
 
 use Symfony\Component\DependencyInjection\Container;
 
+
 class YitGeo
 {
     const GEO_DOMAIN = 'http://geo.yerevan.am/';
