@@ -91,17 +91,17 @@ class GeoBridgeController extends Controller
     }
 
 	/**
-     * This function is used to generate route for active and in Yerevan addresses autocomplete
+     * This function is used to generate route for active addresses autocomplete
      *
-     * @Route("/active/address/autocomplete/{search}", requirements={"search" = ".+"})
-     * @Route("/active/address/district/autocomplete/{districtId}/{search}", requirements={"search" = ".+"})
+     * @Route("/real/address/autocomplete/{search}", requirements={"search" = ".+"})
+     * @Route("/real/address/district/autocomplete/{districtId}/{search}", requirements={"search" = ".+"})
      * @param $search
      * @param $districtId
      * @return Response
      */
-    public function getActiveAddressesAction($search, $districtId = 0)
+    public function getRealAddressesAction($search, $districtId = 0)
     {
-        $addresses = $this->get('yit_geo')->searchActiveAddress($search, self::AUTOCOMPLETE_LIMIT, $districtId);
+        $addresses = $this->get('yit_geo')->searchRealAddress($search, self::AUTOCOMPLETE_LIMIT, $districtId);
 
         if ($addresses)
         {
