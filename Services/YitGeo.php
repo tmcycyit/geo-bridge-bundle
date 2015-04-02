@@ -13,8 +13,8 @@ use Symfony\Component\DependencyInjection\Container;
 
 class YitGeo
 {
-    const GEO_DOMAIN = 'http://geo.yerevan.am/';
-//    const GEO_DOMAIN = 'http://geo.loc/app_dev.php/';
+//    const GEO_DOMAIN = 'http://geo.yerevan.am/';
+    const GEO_DOMAIN = 'http://geo.loc/app_dev.php/';
 
     protected $experience;
 
@@ -114,6 +114,19 @@ class YitGeo
     {
         $search = $this->produceUrlParameter($search);
         return $this->getContent(self::GEO_DOMAIN . 'api/addresses/'. $search .'/search/' . $limit . '/' .  $districtId);
+    }
+
+	/**
+     * This function is used to get $limit addresses by $search string
+     * If there are not any address with such content return null
+     *
+     * @param $dateTime
+     * @return mixed|null|string
+     */
+    public function searchModifiedAddress($dateTime)
+    {
+		$dateTime = $this->produceUrlParameter($dateTime);
+        return $this->getContent(self::GEO_DOMAIN . 'api/addresses/'.$dateTime.'/modified');
     }
 
 	/**

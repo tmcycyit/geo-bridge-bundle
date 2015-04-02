@@ -119,6 +119,34 @@ class GeoBridgeController extends Controller
         return new Response($addresses);
     }
 
+	/**
+     * This function is used to generate route for active addresses autocomplete
+     *
+     * @Route("/real/address/autocomplete/{search}", requirements={"search" = ".+"})
+     * @Route("/addresses/{dataTime}/modified", requirements={"dataTime" = ".+"})
+     * @param $dataTime
+     * @return Response
+     */
+    public function getModifiedAddressesAction($dataTime)
+    {
+        $addresses = $this->get('yit_geo')->searchModifiedAddress($dataTime);
+
+        if ($addresses)
+        {
+            $locale = $this->getRequest()->getLocale();
+            foreach($addresses->data as &$address) {
+                if ($locale == "en") {
+                    $address->title = $address->eng_title;
+                }
+                unset($address->eng_title);
+            }
+        }
+
+        $addresses = json_encode($addresses);
+
+        return new Response($addresses);
+    }
+
 
     /**
      * This function is used to generate route for addresses autocomplete
