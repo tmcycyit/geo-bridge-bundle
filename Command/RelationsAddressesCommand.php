@@ -20,7 +20,8 @@ use Symfony\Component\DependencyInjection\Container;
 
 class RelationsAddressesCommand extends ContainerAwareCommand
 {
-	const GEO_DOMAIN = 'http://geo.loc/app_dev.php/';
+	const GEO_DOMAIN = 'http://geo.yerevan.am/';
+//	const GEO_DOMAIN = 'http://geo.loc/app_dev.php/';
 
 	/**
 	 * This function is used to get content from $link
