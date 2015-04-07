@@ -15,32 +15,24 @@ use Symfony\Component\Process\Process;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Composer\Script\CommandEvent;
 
-class ComposerRunCommand {
+class RunManageGeoStoredProcedureCommand {
 
 	/**
 	 * This function run sql storage procedures after composer install or update
 	 * @param $event CommandEvent A instance
 	 */
-	public static function installSqlProcedure(CommandEvent $event)
+	public static function manageGeoStoredProcedure(CommandEvent $event)
 	{
 		$options = self::getOptions($event);
 		$appDir = $options['symfony-app-dir'];
-		$webDir = $options['symfony-web-dir'];
 
-		if (!is_dir($webDir)) {
-			echo 'The symfony-web-dir ('.$webDir.') specified in composer.json was not found in '.getcwd().', can not install assets.'.PHP_EOL;
-
-			return;
-		}
-
-		static::executeCommand($event, $appDir, 'stored:procedure:run');
+		static::executeCommand($event, $appDir, 'geo:manage:stored:procedure');
 	}
 
 	protected static function getOptions(CommandEvent $event)
 	{
 		$options = array_merge(array(
 			'symfony-app-dir' => 'app',
-			'symfony-web-dir' => 'web',
 		), $event->getComposer()->getPackage()->getExtra());
 
 		return $options;

@@ -20,8 +20,8 @@ use Symfony\Component\DependencyInjection\Container;
 
 class RelationsAddressesCommand extends ContainerAwareCommand
 {
-	const GEO_DOMAIN = 'http://geo.yerevan.am/';
-//	const GEO_DOMAIN = 'http://geo.loc/app_dev.php/';
+//	const GEO_DOMAIN = 'http://geo.yerevan.am/';
+	const GEO_DOMAIN = 'http://geo.loc/app_dev.php/';
 
 	/**
 	 * This function is used to get content from $link
@@ -53,20 +53,19 @@ class RelationsAddressesCommand extends ContainerAwareCommand
 	protected function configure()
 	{
 
-		$this
-			->setName('update:db:active')
-			->setDescription('All DB activate');
+		$this->setName('geo:data:manager')
+			->setDescription('GeoBridgeBundle synchronization data manager ');
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
 		// Begin run command
-		$output->writeln("<info>Starting</info>");
-		$em = $this->getContainer()->get("doctrine")->getManager();
+		$output->writeln("<info>Starting synchronization GeoBridgeBundle and Geo data manager</info>");
 
-		// Begin transaction
-		try {
-			$em->getConnection()->beginTransaction();
+		$em = $this->getContainer()->get("doctrine")->getManager();
+		$connection = $em->getConnection();
+
+		$db = $connection->getDatabase();
 
 		// get project name
 		$this->container = $this->getApplication()->getKernel()->getContainer();
@@ -74,77 +73,48 @@ class RelationsAddressesCommand extends ContainerAwareCommand
 
 		// get Last Update Address
 		$time = $em->getRepository('YitGeoBridgeBundle:Address')->getLastUpdate();
-		$title = str_replace(" ","%20", $time);
+		$title = str_replace(" ", "%20", $time);
 
 		// get updates in Geo
-		$modified = $this->getContent(self::GEO_DOMAIN .'api/addresses/'.$title.'/modified');
-
+		$modified = $this->getContent(self::GEO_DOMAIN . 'api/addresses/' . $title . '/modified');
 		// Begin synchronization address in GEO and YitGeoBridgeBundle
-		if(isset($modified->address)){
+		if (isset($modified->address)) {
 			$addresses = $modified->address;
 			for($i=0; $i<count($addresses); $i++){
 				$object = $addresses[$i];
 
 				// get matching address and edit, if address new and created by project insert
-				$address = $em->getRepository('YitGeoBridgeBundle:Address')->findOneByAddressId($object->id);
-
-				if(isset($address)){
-					$address->setAddress($object->address);
-					$em->persist($address);
-				}
-				elseif(($object->project) == $projectName){
-					$address = new Address();
-					$address->setAddressId($object->id);
-					$address->setAddress($object->address);
-					$em->persist($address);
-				}
+				$addressDataModified = $connection->executeUpdate("CALL GeoDataModified($object->id , '$object->address')");
 			}
 		}
+
 		// get merged address and replace it
-		if ( isset($modified->marged)) {
+		if (isset($modified->marged)) {
 			$marg = $modified->marged;
+			$relations = " SELECT TABLE_NAME, COLUMN_NAME
+ 								FROM information_schema.KEY_COLUMN_USAGE
+								WHERE CONSTRAINT_SCHEMA = :db
+								AND REFERENCED_TABLE_SCHEMA  IS NOT NULL
+								AND REFERENCED_TABLE_NAME = :tables
+								AND REFERENCED_COLUMN_NAME IS NOT NULL
+								";
 
-			for($i = 0;$i<count($marg); $i++){
+			$sth = $connection->prepare("$relations");
 
-				// get matching address in YitGeoBridgeBundle
-				$addressOld = $em->getRepository('YitGeoBridgeBundle:Address')->findOneByAddressId($marg[$i]->oldId);
-				if(isset($addressOld) && $addressOld =! null ){
-					$oldId = $addressOld->getId();
-				}
-				// get real address and if isset old address and not real address insert it and replace in project
-				$addressReal = $em->getRepository('YitGeoBridgeBundle:Address')->findOneByAddressId($marg[$i]->realId);
-				if(isset($addressReal) && $addressReal != null){
-					$realId = $addressReal->getId();
-				}
-				elseif(isset($oldId) && $oldId != null)
-				{
-					$object = $modified->margedAddress[$i];
-					$address = new Address();
-					$address->setAddressId($object[0]->id);
-					$address->setAddress($object[0]->address);
-					$em->persist($address);
-				}
-
-				if(isset($oldId) && $oldId != null){
-					// call sql storage procedure for replaced, set replaced address and replace it
-					$updateSql = $em->getConnection()->executeUpdate("CALL UpdateMarged".$i."(".$oldId, $realId.")");
-					// call sql storage procedure for delete merged address in YitGeoBridgeBundle
-					$deleteMarged = $em->getConnection()->executeUpdate("CALL DeleteMarged(".$oldId.")");
+			$params['db'] = $db;
+			$params['tables'] = 'yit_geo_address';
+			$sth->execute($params);
+			$result = $sth->fetchAll();
+			for ($i = 0; $i < count($result); $i++) {
+				$table = $result[$i]['TABLE_NAME'];
+				$columnName = $result[$i]['COLUMN_NAME'];
+				for ($j = 0; $j < count($marg); $j++) {
+					$margeManager = $connection->executeUpdate("CALL GeoDataManager('$columnName', '$table', '" . $marg[$j]->oldId . "', '" . $marg[$j]->realId . "' ,	'" . $marg[$j]->address . "')");
 				}
 			}
 		}
-			// flash changes
-			$em->flush();
 
-			// coll rollback for Transaction
-			$em->getConnection()->commit();
-			$e = " synchronization is invalid please try again ";
-		} catch (\Exception $e) {
-			$em->getConnection()->rollback();
-			throw $e;
-		}
-
-		$output->writeln("<info>Success ..</info>");
+		$output->writeln("<info>GeoBridgeBundle and Geo synchronization success ..</info>");
 	}
 
 }

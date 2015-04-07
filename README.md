@@ -89,6 +89,23 @@ $this->createFormBuilder()
              ...
 ```
 
+### Step5: Configured GeoBridgeBundle synchronization using run command author composer install or update
+
+Add RunManageGeoStoredProcedureCommand in your composer.json:
+
+```js
+{
+ "scripts": {
+        "post-install-cmd": [
+            "Yit\\GeoBridgeBundle\\Command\\RunManageGeoStoredProcedureCommand::manageGeoStoredProcedure"
+        ],
+        "post-update-cmd": [
+            "Yit\\GeoBridgeBundle\\Command\\RunManageGeoStoredProcedureCommand::manageGeoStoredProcedure"
+        ]
+    },
+}
+```
+
 Now the bundle is configured and ready to use, if you need to use in entity address, street or district which will
 a relation with GeoBundle addresses, streets and districts, then you will implements the AddressableInterface,
 StreetableInterface, MultiAddressableInterface, DistrictableInterface and other interfaces accordingly in your entites.
