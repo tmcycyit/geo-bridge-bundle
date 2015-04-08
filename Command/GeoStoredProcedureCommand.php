@@ -1,13 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: tigran
- * Date: 3/30/15
- * Time: 5:17 PM
- */
 
 namespace Yit\GeoBridgeBundle\Command;
-
 
 use Doctrine\ORM\Query\ResultSetMapping;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;

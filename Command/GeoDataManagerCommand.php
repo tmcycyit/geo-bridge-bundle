@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: tigran
- * Date: 3/27/15
- * Time: 4:38 PM
- */
 
 namespace Yit\GeoBridgeBundle\Command;
 
@@ -32,9 +26,11 @@ class GeoDataManagerCommand extends ContainerAwareCommand
 	 */
 	private function getContent($link, $context = null)
 	{
+		// reads a file into a string.
 		$content = @file_get_contents($link, false, $context);
 
 		if ($content) {
+			// content json decode
 			$content = json_decode($content);
 
 			if (isset($content->status) && $content->status != 404) {
@@ -48,28 +44,31 @@ class GeoDataManagerCommand extends ContainerAwareCommand
 		return $content;
 	}
 
-	protected $container;
-
+	/**
+	 * This function give configurations command: name and description
+	 */
 	protected function configure()
 	{
-
+		// definition of the command name and description
 		$this->setName('geo:data:manager')
 			->setDescription('GeoBridgeBundle synchronization data manager ');
 	}
 
+	/**
+	 * @param InputInterface $input
+	 * @param OutputInterface $output
+	 */
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
 		// Begin run command
 		$output->writeln("<info>Starting synchronization GeoBridgeBundle and Geo data manager</info>");
 
+		// get manager
 		$em = $this->getContainer()->get("doctrine")->getManager();
 		$connection = $em->getConnection();
 
+		// get database name
 		$databaseName = $connection->getDatabase();
-
-		// get project name
-		$this->container = $this->getApplication()->getKernel()->getContainer();
-		$projectName = $this->container->getParameter('yit_geo_bridge.project_name');
 
 		// get Last Update Address
 		$dateTime = str_replace(" ", "%20", $em->getRepository('YitGeoBridgeBundle:Address')->getLastUpdate());
@@ -77,18 +76,24 @@ class GeoDataManagerCommand extends ContainerAwareCommand
 		// get updates in Geo
 		$modified = $this->getContent(self::GEO_DOMAIN . 'api/addresses/' . $dateTime . '/modified');
 
+		// start Transaction
+	$conn = $connection->beginTransaction();
+
+	try{
 		// Begin synchronization address in GEO and YitGeoBridgeBundle
 		if (isset($modified->address)) {
 			$addresses = $modified->address;
+
 			for($i=0; $i<count($addresses); $i++){
 				$object = $addresses[$i];
 
+				// get address by address_id in YitGeoBridgeBundle
 				$bridgeAddress = $em->getRepository('YitGeoBridgeBundle:Address')->findOneByAddressId($object->id);
 
 				if(isset($bridgeAddress) && $bridgeAddress != null){
 
 					// get matching address and update, if address isset
-					$addressDataModified = $connection->executeUpdate("CALL GeoDataModified($object->id , '$object->address')");
+					$connection->executeUpdate("CALL GeoDataModified($object->id , '$object->address')");
 				}
 			}
 		}
@@ -108,10 +113,12 @@ class GeoDataManagerCommand extends ContainerAwareCommand
 
 			$sth = $connection->prepare("$relations");
 
+			// set parameters in query
 			$params['database_name'] = $databaseName;
 			$params['referenced_table_name'] = 'yit_geo_address';
 			$sth->execute($params);
 			$result = $sth->fetchAll();
+
 			for ($i = 0; $i < count($result); $i++) {
 
 				//get related table and column name
@@ -120,11 +127,22 @@ class GeoDataManagerCommand extends ContainerAwareCommand
 				for ($j = 0; $j < count($merge); $j++) {
 
 					// Call Geo Data Manager
-					$mergeManager = $connection->executeUpdate("CALL GeoDataManager('$table', '$columnName', '" . $merge[$j]->merged_id . "', '" . $merge[$j]->real_id . "' ,	'" . $merge[$j]->address . "')");
+					$connection->executeUpdate("CALL GeoDataManager('$table', '$columnName', '" . $merge[$j]->merged_id . "', '" . $merge[$j]->real_id . "' ,	'" . $merge[$j]->address . "')");
 				}
 			}
 		}
+	// commit oll changes
+	$conn->commit();
 
+	}
+	//then something wrong
+	catch(\Exception $e)
+		{
+	//rollback to the previously stable state
+		$conn->rollback();
+		//restore database to its original state.
+			throw $e;
+		}
 		$output->writeln("<info>GeoBridgeBundle and Geo synchronization success ..</info>");
 	}
 

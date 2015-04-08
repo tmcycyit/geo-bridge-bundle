@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: tigran
- * Date: 4/2/15
- * Time: 11:24 AM
- */
 
 namespace Yit\GeoBridgeBundle\Command;
 
@@ -29,6 +23,12 @@ class ManageGeoStoredProcedureCommand {
 		static::executeCommand($event, $appDir, 'geo:manage:stored:procedure');
 	}
 
+	/**
+	 * Gives options command
+	 *
+	 * @param CommandEvent $event
+	 * @return array
+	 */
 	protected static function getOptions(CommandEvent $event)
 	{
 		$options = array_merge(array(
@@ -38,6 +38,13 @@ class ManageGeoStoredProcedureCommand {
 		return $options;
 	}
 
+	/**
+	 *
+	 * @param CommandEvent $event
+	 * @param $appDir
+	 * @param $cmd
+	 * @param int $timeout
+	 */
 	protected static function executeCommand(CommandEvent $event, $appDir, $cmd, $timeout = 300)
 	{
 		$php = escapeshellarg(self::getPhp());
@@ -53,6 +60,11 @@ class ManageGeoStoredProcedureCommand {
 		}
 	}
 
+	/**
+	 * If app console works using php
+	 *
+	 * @return false|string
+	 */
 	protected static function getPhp()
 	{
 		$phpFinder = new PhpExecutableFinder();
