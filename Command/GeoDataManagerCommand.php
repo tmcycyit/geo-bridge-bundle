@@ -18,7 +18,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Yit\GeoBridgeBundle\Entity\Address;
 use Symfony\Component\DependencyInjection\Container;
 
-class RelationsAddressesCommand extends ContainerAwareCommand
+class GeoDataManagerCommand extends ContainerAwareCommand
 {
 	const GEO_DOMAIN = 'http://geo.yerevan.am/';
 //	const GEO_DOMAIN = 'http://geo.loc/app_dev.php/';
