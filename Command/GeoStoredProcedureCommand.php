@@ -14,6 +14,10 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Class GeoStoredProcedureCommand
+ * @package Yit\GeoBridgeBundle\Command
+ */
 class GeoStoredProcedureCommand extends ContainerAwareCommand
 {
 
@@ -31,7 +35,6 @@ class GeoStoredProcedureCommand extends ContainerAwareCommand
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
-
 		$output->writeln("<info>Starting manage GeoBridgeBundle Stored Procedure mySql</info>");
 		$em = $this->getContainer()->get("doctrine")->getManager()->getConnection();
 
@@ -42,20 +45,26 @@ class GeoStoredProcedureCommand extends ContainerAwareCommand
 
 		// create Geo Data Modified storage procedure
 		$geoDataModified = "DROP PROCEDURE IF EXISTS `GeoDataModified` ;
-						 CREATE PROCEDURE  `GeoDataModified` ( IN  `realId` INT( 11 ) ,
+						 CREATE PROCEDURE  `GeoDataModified` ( IN  `real_id` INT( 11 ) ,
 															   IN  `address` VARCHAR( 255 ) )
 						 COMMENT  'Geo data modified stored procedure' NOT DETERMINISTIC CONTAINS SQL SQL SECURITY DEFINER
-						 BEGIN
-						 DECLARE created_item DOUBLE;
-						 SELECT id INTO created_item
-						FROM  `yit_geo_address` WHERE addressId = realId;
+						 	BEGIN
+						 DECLARE geo_address_id DOUBLE;
+							DECLARE EXIT HANDLER FOR SQLEXCEPTION
+							 BEGIN
+								  ROLLBACK;
+							 END;
+							START TRANSACTION;
 
-						IF created_item > -1 THEN
-						UPDATE  `yit_geo_address` SET address = address, updated = NOW() WHERE addressId = realId;
+						 SELECT id INTO geo_address_id
+						FROM  `yit_geo_address` WHERE address_id = real_id;
+
+						IF geo_address_id > -1 THEN
+						UPDATE  `yit_geo_address` SET address = address, updated = NOW() WHERE address_id = real_id;
 						ELSE
-						INSERT INTO  `yit_geo_address` (  `id` ,  `addressId` ,  `address` ,  `created` ,  `updated` )
+						INSERT INTO  `yit_geo_address` (  `id` ,  `address_id` ,  `address` ,  `created` ,  `updated` )
 						VALUES (
-						NULL , realId, address, NOW( ) , NOW( )
+						NULL , real_id, address, NOW( ) , NOW( )
 						);
 						END IF ;
 						COMMIT ;
@@ -66,24 +75,30 @@ class GeoStoredProcedureCommand extends ContainerAwareCommand
 
 		// create Geo Data Manager storage procedure
 		$geoDataManager = "DROP PROCEDURE IF EXISTS `GeoDataManager` ;
-						CREATE PROCEDURE  `GeoDataManager` ( IN  `column_name` VARCHAR( 100 ) ,
-															 IN  `newsInfoTable` VARCHAR( 100 ) ,
-															 IN  `oldId` INT( 11 ) ,
-															 IN  `newId` INT( 11 ) ,
+						CREATE PROCEDURE  `GeoDataManager` ( IN  `table_name` VARCHAR( 100 ) ,
+															 IN  `column_name` VARCHAR( 100 ) ,
+															 IN  `merged_id` INT( 11 ) ,
+															 IN  `real_id` INT( 11 ) ,
 															 IN  `address` VARCHAR( 255 ) )
 					    COMMENT 'Geo data manager stored procedure'
 					    NOT DETERMINISTIC MODIFIES SQL DATA SQL SECURITY DEFINER
-							BEGIN
-					     CALL GeoDataModified(newId, address);
-						SET @update = CONCAT(  'UPDATE ', newsInfoTable,  ' SET ', column_name,  '= (
-                     		SELECT id FROM yit_geo_address WHERE addressId = ', newId,  ')
+						BEGIN
+							DECLARE EXIT HANDLER FOR SQLEXCEPTION
+						 		BEGIN
+							  		ROLLBACK;
+						 		END;
+							START TRANSACTION;
+					     CALL GeoDataModified(real_id, address);
+						SET @update = CONCAT(  'UPDATE ', table_name,  ' SET ', column_name,  '= (
+                     		SELECT id FROM yit_geo_address WHERE address_id = ', real_id,  ')
                      	WHERE ', column_name,  '= (
-                     		SELECT id FROM yit_geo_address WHERE addressId = ', oldId,  ')' ) ;
+                     		SELECT id FROM yit_geo_address WHERE address_id = ', merged_id,  ')' ) ;
 						PREPARE stmt FROM @update ;
 						EXECUTE stmt;
-						DELETE FROM yit_geo_address WHERE yit_geo_address.addressId = oldId;
-						COMMIT ;
+						DELETE FROM yit_geo_address WHERE yit_geo_address.address_id = merged_id;
+							COMMIT ;
 						END";
+
 		$em->executeUpdate($geoDataManager, $margeParams);
 
 		$output->writeln("<info>GeoBridgeBundle storage procedures successfully created or updated!</info>");

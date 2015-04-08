@@ -11,7 +11,13 @@ use Doctrine\ORM\EntityRepository;
 
 class AddressRepository extends EntityRepository
 {
-
+	/**
+	 * This function find last updated date time
+	 *
+	 * @return mixed
+	 * @throws \Doctrine\ORM\NoResultException
+	 * @throws \Doctrine\ORM\NonUniqueResultException
+	 */
 	public function getLastUpdate()
 	{
 		$result =  $this->getEntityManager()

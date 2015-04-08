@@ -28,7 +28,7 @@ class Address
     /**
      * @var integer
      *
-     * @ORM\Column(name="addressId", type="integer")
+     * @ORM\Column(name="address_id", type="integer")
      */
     private $addressId;
 
@@ -110,6 +110,29 @@ class Address
     {
         return $this->address;
     }
+
+	/**
+	 * Set created
+	 *
+	 * @param \DateTime $created
+	 * @return Address
+	 */
+	public function setCreated($created)
+	{
+		$this->created = $created;
+
+		return $this;
+	}
+
+	/**
+	 * Get created
+	 *
+	 * @return \DateTime
+	 */
+	public function getCreated()
+	{
+		return $this->created;
+	}
 
 	/**
 	 * Set updated
