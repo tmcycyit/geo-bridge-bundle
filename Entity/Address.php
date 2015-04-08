@@ -5,6 +5,7 @@ namespace Yit\GeoBridgeBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\ORM\Mapping\UniqueConstraint;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 use JMS\Serializer\Annotation\Type;
 
@@ -13,6 +14,7 @@ use JMS\Serializer\Annotation\Type;
  *
  * @ORM\Table(name="yit_geo_address")
  * @ORM\Entity(repositoryClass="Yit\GeoBridgeBundle\Entity\Repository\AddressRepository")
+ * @UniqueEntity("address_id")
  */
 class Address
 {
@@ -28,7 +30,7 @@ class Address
     /**
      * @var integer
      *
-     * @ORM\Column(name="address_id", type="integer")
+     * @ORM\Column(name="address_id", type="integer", unique=true)
      */
     private $addressId;
 

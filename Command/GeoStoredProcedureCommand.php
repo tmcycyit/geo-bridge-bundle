@@ -82,10 +82,8 @@ class GeoStoredProcedureCommand extends ContainerAwareCommand
 						 		END;
 							START TRANSACTION;
 					     CALL GeoDataModified(real_id, address);
-						SET @update = CONCAT(  'UPDATE ', table_name,  ' SET ', column_name,  '= (
-                     		SELECT id FROM yit_geo_address WHERE address_id = ', real_id,  ')
-                     	WHERE ', column_name,  '= (
-                     		SELECT id FROM yit_geo_address WHERE address_id = ', merged_id,  ')' ) ;
+						SET @update = CONCAT(  'UPDATE ',table_name,  ' SET ', column_name,  ' = ',real_id,'
+                     	WHERE ', column_name,  '= ',merged_id,'') ;
 						PREPARE stmt FROM @update ;
 						EXECUTE stmt;
 						DELETE FROM yit_geo_address WHERE yit_geo_address.address_id = merged_id;

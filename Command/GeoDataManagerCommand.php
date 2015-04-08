@@ -75,9 +75,9 @@ class GeoDataManagerCommand extends ContainerAwareCommand
 
 		// get updates in Geo
 		$modified = $this->getContent(self::GEO_DOMAIN . 'api/addresses/' . $dateTime . '/modified');
-
+//var_dump($modified); exit;
 		// start Transaction
-	$conn = $connection->beginTransaction();
+	$connection->beginTransaction();
 
 	try{
 		// Begin synchronization address in GEO and YitGeoBridgeBundle
@@ -118,12 +118,12 @@ class GeoDataManagerCommand extends ContainerAwareCommand
 			$params['referenced_table_name'] = 'yit_geo_address';
 			$sth->execute($params);
 			$result = $sth->fetchAll();
-
 			for ($i = 0; $i < count($result); $i++) {
 
 				//get related table and column name
 				$table = $result[$i]['TABLE_NAME'];
 				$columnName = $result[$i]['COLUMN_NAME'];
+
 				for ($j = 0; $j < count($merge); $j++) {
 
 					// Call Geo Data Manager
@@ -132,14 +132,13 @@ class GeoDataManagerCommand extends ContainerAwareCommand
 			}
 		}
 	// commit oll changes
-	$conn->commit();
-
+		$connection->commit();
 	}
 	//then something wrong
 	catch(\Exception $e)
 		{
 	//rollback to the previously stable state
-		$conn->rollback();
+			$connection->rollback();
 		//restore database to its original state.
 			throw $e;
 		}
