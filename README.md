@@ -97,10 +97,10 @@ Add RunManageGeoStoredProcedureCommand in your composer.json:
 {
  "scripts": {
         "post-install-cmd": [
-            "Yit\\GeoBridgeBundle\\Command\\RunManageGeoStoredProcedureCommand::manageGeoStoredProcedure"
+            "Yit\\GeoBridgeBundle\\Command\\ManageGeoStoredProcedureCommand::manageGeoStoredProcedure"
         ],
         "post-update-cmd": [
-            "Yit\\GeoBridgeBundle\\Command\\RunManageGeoStoredProcedureCommand::manageGeoStoredProcedure"
+            "Yit\\GeoBridgeBundle\\Command\\ManageGeoStoredProcedureCommand::manageGeoStoredProcedure"
         ]
     },
 }

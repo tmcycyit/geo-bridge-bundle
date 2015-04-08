@@ -15,7 +15,7 @@ use Symfony\Component\Process\Process;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Composer\Script\CommandEvent;
 
-class RunManageGeoStoredProcedureCommand {
+class ManageGeoStoredProcedureCommand {
 
 	/**
 	 * This function run sql storage procedures after composer install or update
