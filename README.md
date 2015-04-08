@@ -89,7 +89,7 @@ $this->createFormBuilder()
              ...
 ```
 
-### Step5: Configured GeoBridgeBundle synchronization using run command author composer install or update
+### Step5: Configured GeoBridgeBundle synchronization using run command after composer install or update
 
 Add RunManageGeoStoredProcedureCommand in your composer.json:
 
