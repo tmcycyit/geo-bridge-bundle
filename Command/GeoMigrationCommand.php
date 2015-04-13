@@ -71,44 +71,49 @@ class GeoMigrationCommand extends ContainerAwareCommand
 		$databaseName = $connection->getDatabase();
 		// use project database
 		$margeParams['db'] = $databaseName;
+
 		// create storage procedures MySql
-		// this storage procedure create column if exist table by parameters
+        //  create new temp column (by adding 'geo_' prefix) for migration by given database, table and column names.
 		$geoDataCreate = "DROP PROCEDURE IF EXISTS `GeoDataMigrationCreate` ;
 						 CREATE PROCEDURE  `GeoDataMigrationCreate` ( IN  `tableName` VARCHAR( 255 ) ,
 															   IN  `dbName` VARCHAR( 255 ) ,
 															   IN  `columnName` VARCHAR( 255 ) )
 						 COMMENT  'Create duplicated address column before column name add geo_' NOT DETERMINISTIC CONTAINS SQL SQL SECURITY DEFINER
 						 	BEGIN
-						IF EXISTS( SELECT NULL
-						FROM INFORMATION_SCHEMA.COLUMNS
-						WHERE table_name = tableName
-						AND table_schema = dbName
-						AND column_name = columnName)  THEN
-						SET @alter = CONCAT(  'ALTER TABLE ',tableName,' ADD geo_', columnName,' int(255);') ;
-						PREPARE stmt FROM @alter ;
-						EXECUTE stmt;
-						END IF;
-						END
+                                IF EXISTS( SELECT NULL
+                                    FROM INFORMATION_SCHEMA.COLUMNS
+                                    WHERE table_name = tableName
+                                    AND table_schema = dbName
+                                    AND column_name = columnName)
+                                THEN
+                                    SET @alter = CONCAT(  'ALTER TABLE ',tableName,' ADD geo_', columnName,' int(11);') ;
+                                    PREPARE stmt FROM @alter ;
+                                    EXECUTE stmt;
+                                END IF;
+                            END
 						";
+
 		// this storage procedure update column if exist column by parameters
-		// if exist geo address column insert data from geo address columns to new created column`s storage procedure
+		// if exist geo address column insert data from geo address columns to new created column`s
 		$geoDataUpdate = "DROP PROCEDURE IF EXISTS `GeoDataMigrationUpdate` ;
 						 CREATE PROCEDURE  `GeoDataMigrationUpdate` ( IN  `tableName` VARCHAR( 255 ) ,
 															   IN  `dbName` VARCHAR( 255 ) ,
 															   IN  `columnName` VARCHAR( 255 ) )
 						 COMMENT  'Duplicated address data from geo address column to created column`s' NOT DETERMINISTIC CONTAINS SQL SQL SECURITY DEFINER
 						 	BEGIN
-						IF EXISTS( SELECT NULL
-						FROM INFORMATION_SCHEMA.COLUMNS
-						WHERE table_name = tableName
-						AND table_schema = dbName
-						AND column_name = columnName)  THEN
-						SET @update = CONCAT(  'UPDATE  ',tableName,' SET geo_', columnName,' = ', columnName,';') ;
-						PREPARE stmt FROM @update ;
-						EXECUTE stmt;
-						END IF;
-						END
+                                IF EXISTS( SELECT NULL
+                                    FROM INFORMATION_SCHEMA.COLUMNS
+                                    WHERE table_name = tableName
+                                    AND table_schema = dbName
+                                    AND column_name = columnName)
+                                THEN
+                                    SET @update = CONCAT(  'UPDATE  ',tableName,' SET geo_', columnName,' = ', columnName,';') ;
+                                    PREPARE stmt FROM @update ;
+                                    EXECUTE stmt;
+                                END IF;
+                            END
 						";
+
 		// this storage procedure drop column if exist table by parameters
 		// if exist geo address column create, update and drop old geo address columns
 		$geoDataDrop = "DROP PROCEDURE IF EXISTS `GeoDataMigration` ;
@@ -117,19 +122,21 @@ class GeoMigrationCommand extends ContainerAwareCommand
 															   IN  `columnName` VARCHAR( 255 ) )
 						 COMMENT  'Call GeoDataMigrationCreate and GeoDataMigrationUpdate stored procedures and Drop old addresses column`s' NOT DETERMINISTIC CONTAINS SQL SQL SECURITY DEFINER
 						 	BEGIN
-						 	CALL GeoDataMigrationCreate(tableName, dbName, columnName);
-						 	CALL GeoDataMigrationUpdate(tableName, dbName, columnName);
-						IF EXISTS( SELECT NULL
-						FROM INFORMATION_SCHEMA.COLUMNS
-						WHERE table_name = tableName
-						AND table_schema = dbName
-						AND column_name = columnName)  THEN
-						SET @drop = CONCAT(  'ALTER TABLE ',tableName,' DROP  ', columnName,';') ;
-						PREPARE stmt FROM @drop ;
-						EXECUTE stmt;
-						END IF;
-						END
+                                CALL GeoDataMigrationCreate(tableName, dbName, columnName);
+                                CALL GeoDataMigrationUpdate(tableName, dbName, columnName);
+                                IF EXISTS( SELECT NULL
+                                    FROM INFORMATION_SCHEMA.COLUMNS
+                                    WHERE table_name = tableName
+                                    AND table_schema = dbName
+                                    AND column_name = columnName)
+                                THEN
+                                    SET @drop = CONCAT(  'ALTER TABLE ',tableName,' DROP  ', columnName,';') ;
+                                    PREPARE stmt FROM @drop ;
+                                    EXECUTE stmt;
+                                END IF;
+                            END
 						";
+
 		//create storage procedures
 		$connection->executeUpdate($geoDataCreate, $margeParams);
 		$connection->executeUpdate($geoDataUpdate, $margeParams);
