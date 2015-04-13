@@ -39,7 +39,7 @@ class GeoStoredProcedureCommand extends ContainerAwareCommand
 		// create Geo Data Modified storage procedure
 		$geoDataModified = "DROP PROCEDURE IF EXISTS `GeoDataModified` ;
 						 CREATE PROCEDURE  `GeoDataModified` ( IN  `real_id` INT( 11 ) ,
-															   IN  `address` VARCHAR( 255 ) )
+															   IN  `address` VARCHAR( 255 )  CHARSET utf8 )
 						 COMMENT  'Geo data modified stored procedure' NOT DETERMINISTIC CONTAINS SQL SQL SECURITY DEFINER
 						 	BEGIN
 						 DECLARE geo_address_id DOUBLE;
@@ -72,7 +72,7 @@ class GeoStoredProcedureCommand extends ContainerAwareCommand
 															 IN  `column_name` VARCHAR( 100 ) ,
 															 IN  `merged_id` INT( 11 ) ,
 															 IN  `real_id` INT( 11 ) ,
-															 IN  `address` VARCHAR( 255 ) )
+															 IN  `address` VARCHAR( 255 )  CHARSET utf8 )
 					    COMMENT 'Geo data manager stored procedure'
 					    NOT DETERMINISTIC MODIFIES SQL DATA SQL SECURITY DEFINER
 						BEGIN
