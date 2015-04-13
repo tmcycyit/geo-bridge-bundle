@@ -146,35 +146,36 @@ class GeoMigrationCommand extends ContainerAwareCommand
 		$entities = array('Company' => 'Ads\MainBundle\Entity\BaseCompany',
 						  'Place' => 'Ads\MainBundle\Entity\PlaceAddress',);
 
-		$coumsNames = array();
-		$tableNames = array();
+		$tables = array();
+
 		// find geo address fields
 		foreach ($entities as $className => $entity) {
 
 			// get entity name
-			$tableNames[] = $em->getClassMetadata($entity)->getTableName();
+            $tmpData = array('name' => $em->getClassMetadata($entity)->getTableName(), 'columns' => array());
+
 			// get address columns
 			$coums = $em->getClassMetadata($entity)->getAssociationsByTargetClass('Yit\GeoBridgeBundle\Entity\Address');
 
-			foreach ($coums as $colum) {
-				// find join column field names
-				$coumsNames[] = $colum['joinColumnFieldNames'];
+            if($coums && count($coums) > 0){
 
-			}
+                foreach ($coums as $colum) {
+                    // find join column field names
+                    $tmpData['columns'][] = $colum['joinColumnFieldNames'];
+                }
+
+                $tables[] = $tmpData;
+            }
 		}
 
-		foreach ($tableNames as $tableName) {
+        // LOOP ALL TABLES
+		foreach ($tables as $table) {
+            foreach ($table['columns'] as $columnName) {
+                // if exist geo address column create new column`s storage procedure
 
-			for ($i = 0; $i < count($coumsNames); $i++) {
-
-				foreach ($coumsNames[$i] as $coumsName) {
-					// if exist geo address column create new column`s storage procedure
-
-					// call storage procedure is create new columns, insert data from old columns in new columns and drop old geo address column`s
-					$connection->executeUpdate("CALL GeoDataMigration('$tableName', '$databaseName', '$coumsName')");
-				}
-			}
-
+                // call storage procedure is create new columns, insert data from old columns in new columns and drop old geo address column`s
+                $connection->executeUpdate("CALL GeoDataMigration('{$table['name']}', '$databaseName', '$columnName')");
+            }
 		}
 
 		// get all geo address in company table
