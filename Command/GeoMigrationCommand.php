@@ -15,8 +15,8 @@ use Symfony\Component\DependencyInjection\Container;
 
 class GeoMigrationCommand extends ContainerAwareCommand
 {
-//	const GEO_DOMAIN = 'http://geo.yerevan.am/';
-	const GEO_DOMAIN = 'http://geo.loc/app_dev.php/';
+	const GEO_DOMAIN = 'http://geo.yerevan.am/';
+//	const GEO_DOMAIN = 'http://geo.loc/app_dev.php/';
 
 	/**
 	 * This function is used to get content from $link
@@ -122,7 +122,7 @@ class GeoMigrationCommand extends ContainerAwareCommand
 										EXECUTE stmt;
                                     END;
                                     BEGIN
-										SET @drop = CONCAT('ALTER TABLE ',tableName,' DROP  ', columnName,';') ;
+										SET @drop = CONCAT('ALTER TABLE ',tableName,' DROP ', columnName,';') ;
 										PREPARE stmt FROM @drop ;
 										EXECUTE stmt;
                                     END;
@@ -192,7 +192,7 @@ class GeoMigrationCommand extends ContainerAwareCommand
 					$sthExist->closeCursor();
 
 					if(isset($exist['result']) && $exist['result'] >0){
-						// get addresses ids in project
+						// get addresses id`s in project
 						$addressCompany = "SELECT geo_".$columnName."
 											FROM ".$databaseName.".".$table['name']."
 											WHERE geo_".$columnName." IS NOT NULL
@@ -243,10 +243,7 @@ class GeoMigrationCommand extends ContainerAwareCommand
 		}
 
 		// create MySQL storage procedure
-		// This storage procedure create columns for relation,
-		// create relations
-		// Insert data
-		// drop temp column`s
+		// This storage procedure create columns for relation, create relations, insert data, drop temp column`s
 		$geoDataRelation = "DROP PROCEDURE IF EXISTS `GeoRelation` ;
 						 CREATE PROCEDURE  `GeoRelation` ( IN  `tableName` VARCHAR( 255 ) ,
 															   IN  `dbName` VARCHAR( 255 ) ,
@@ -272,7 +269,7 @@ class GeoMigrationCommand extends ContainerAwareCommand
 										EXECUTE stmt;
                                     END;
                                     BEGIN
-										SET @update = CONCAT(	'UPDATE ',tableName,' SET ',mainColumn,' = (
+										SET @update = CONCAT('UPDATE ',tableName,' SET ',mainColumn,' = (
 																SELECT address_id FROM yit_geo_address WHERE address_id = ', columnName,');');
 										PREPARE stmt FROM @update ;
 										EXECUTE stmt;
