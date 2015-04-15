@@ -15,66 +15,65 @@ use Symfony\Component\DependencyInjection\Container;
 
 class GeoMigrationCommand extends ContainerAwareCommand
 {
-	const GEO_DOMAIN = 'http://geo.yerevan.am/';
+    const GEO_DOMAIN = 'http://geo.yerevan.am/';
 //	const GEO_DOMAIN = 'http://geo.loc/app_dev.php/';
 
-	/**
-	 * This function is used to get content from $link
-	 *
-	 * @param $link
-	 * @param null $context
-	 * @return mixed|null|string
-	 */
-	private function getContent($link, $context = null)
-	{
-		// reads a file into a string.
-		$content = @file_get_contents($link, false, $context);
+    /**
+     * This function is used to get content from $link
+     *
+     * @param $link
+     * @param null $context
+     * @return mixed|null|string
+     */
+    private function getContent($link, $context = null)
+    {
+        // reads a file into a string.
+        $content = @file_get_contents($link, false, $context);
 
-		if ($content) {
-			// content json decode
-			$content = json_decode($content);
+        if ($content) {
+            // content json decode
+            $content = json_decode($content);
 
-			if (isset($content->status) && $content->status != 404) {
-				$content = null;
-			}
-		}
-		else {
-			$content = null;
-		}
+            if (isset($content->status) && $content->status != 404) {
+                $content = null;
+            }
+        } else {
+            $content = null;
+        }
 
-		return $content;
-	}
+        return $content;
+    }
 
-	/**
-	 * This function give configurations command: name and description
-	 */
-	protected function configure()
-	{
-		// definition of the command name and description
-		$this->setName('geo:address:migration')
-			 ->setDescription('GeoBridgeBundle geo address migration data manager ');
-	}
+    /**
+     * This function give configurations command: name and description
+     */
+    protected function configure()
+    {
+        // definition of the command name and description
+        $this->setName('geo:address:migration')
+            ->setDescription('GeoBridgeBundle geo address migration data manager ');
+    }
 
-	/**
-	 * @param InputInterface $input
-	 * @param OutputInterface $output
-	 */
-	protected function execute(InputInterface $input, OutputInterface $output)
-	{
-		// Begin run command
-		$output->writeln("<info>Starting GeoBridgeBundle and Project migration</info>");
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     */
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        // Begin run command
+        $output->writeln("<info>Starting GeoBridgeBundle and Project migration</info>");
 
-		// get manager
-		$em = $this->getContainer()->get("doctrine")->getManager();
+        // get manager
+        $em = $this->getContainer()->get("doctrine")->getManager();
 
-		$connection = $em->getConnection();
-		$databaseName = $connection->getDatabase();
-		// use project database
-		$margeParams['db'] = $databaseName;
+        $connection = $em->getConnection();
+        $databaseName = $connection->getDatabase();
+        // use project database
+        $margeParams['db'] = $databaseName;
 
-		//This storage procedure to check exist column by database name, table name and column name
-		//if exist return 1 else return 0
-		$geoExistTable = "DROP PROCEDURE IF EXISTS `GeoExist` ;
+        //This storage procedure to check exist column by database name, table name and column name
+        //if exist return 1 else return 0
+        $geoExistTable = "DROP PROCEDURE IF EXISTS `GeoExist` ;
 						 CREATE PROCEDURE  `GeoExist` ( IN  `tableName` VARCHAR( 255 ) ,
 															   IN  `dbName` VARCHAR( 255 ) ,
 															   IN  `columnName` VARCHAR( 255 ))
@@ -95,11 +94,11 @@ class GeoMigrationCommand extends ContainerAwareCommand
 						END
 						";
 
-		// create storage procedures MySql
-		//  create new temp column (by adding 'geo_' prefix) for migration by given database, table and column names.
-		// copy data from olt columns to new columns
-		// drop old columns
-		$geoDataDrop = "DROP PROCEDURE IF EXISTS `GeoDataMigration` ;
+        // create storage procedures MySql
+        //  create new temp column (by adding 'geo_' prefix) for migration by given database, table and column names.
+        // copy data from olt columns to new columns
+        // drop old columns
+        $geoDataDrop = "DROP PROCEDURE IF EXISTS `GeoDataMigration` ;
 						 CREATE PROCEDURE  `GeoDataMigration` ( IN  `tableName` VARCHAR( 255 ) ,
 															   IN  `dbName` VARCHAR( 255 ) ,
 															   IN  `columnName` VARCHAR( 255 ) )
@@ -130,121 +129,125 @@ class GeoMigrationCommand extends ContainerAwareCommand
                             END
 						";
 
-		//create storage procedures
-		$connection->executeUpdate($geoExistTable, $margeParams);
-		$connection->executeUpdate($geoDataDrop, $margeParams);
+        //create storage procedures
+        $connection->executeUpdate($geoExistTable, $margeParams);
+        $connection->executeUpdate($geoDataDrop, $margeParams);
 
-		//get entity`as we used geo address
-		$entities = array();
+        //get entity`as we used geo address
+        $entities = array();
 
-		// get all entity`s in project
-		$metas = $em->getMetadataFactory()->getAllMetadata();
+        // get all entity`s in project
+        $metas = $em->getMetadataFactory()->getAllMetadata();
 
-		foreach ($metas as $meta) {
-			// get entity`s names
-			$entities[] = $meta->getName();
-		}
+        foreach ($metas as $meta) {
+            // get entity`s names
+            $entities[] = $meta->getName();
+        }
 
-		$tables = array();
+        $tables = array();
 
-		// find geo address fields
-		foreach ($entities as $className => $entity) {
+        // find geo address fields
+        foreach ($entities as $className => $entity) {
 
-			// get entity table name
+            // get entity table name
             $tmpData = array('name' => $em->getClassMetadata($entity)->getTableName(), 'columns' => array());
 
-			// get address columns if entity related to YitGeoBridgeBundle:Address
-			$coums = $em->getClassMetadata($entity)->getAssociationsByTargetClass('Yit\GeoBridgeBundle\Entity\Address');
+            // get address columns if entity related to YitGeoBridgeBundle:Address
+            $coums = $em->getClassMetadata($entity)->getAssociationsByTargetClass('Yit\GeoBridgeBundle\Entity\Address');
 
-			if($coums && count($coums) > 0){
+            if ($coums && count($coums) > 0) {
 
                 foreach ($coums as $colum) {
                     // find join column field names
                     $tmpData['columns'][] = $colum['joinColumnFieldNames'];
                 }
                 $tables[] = $tmpData;
-			}
-		}
+            }
+        }
 
-		$connection->beginTransaction();
-	try{
-		// address id`s in project
-		$idsResults = array();
-		// get table form tables
-		foreach ($tables as $table) {
-			// get columns by table
-            foreach ($table['columns'] as $columnNames) {
+        $connection->beginTransaction();
 
-				foreach($columnNames as $columnName)
-				{
-					// call storage procedure is create new columns, insert data from old columns in new columns and drop old geo address column`s
-					$connection->executeUpdate("CALL GeoDataMigration('{$table['name']}', '$databaseName', '$columnName')");
+        try {
+            // address id`s in project
+            $idsResults = array();
 
-					// check exists tables
-					$sthExist = $connection->prepare("CALL GeoExist('{$table['name']}', '$databaseName', 'geo_$columnName')");
-					// give parameters
-					$params['tableName'] = $table['name'];
-					$params['database_name'] = $databaseName;
-					$params['columnName'] = $columnName;
-					// execute parameters
-					$sthExist->execute($params);
-					$exist = $sthExist->fetch();
-					$sthExist->closeCursor();
+            // get table form tables
+            foreach ($tables as $table) {
+                // get columns by table
+                foreach ($table['columns'] as $columnNames) {
 
-					if(isset($exist['result']) && $exist['result'] >0){
-						// get addresses id`s in project
-						$addressCompany = "SELECT geo_".$columnName."
-											FROM ".$databaseName.".".$table['name']."
-											WHERE geo_".$columnName." IS NOT NULL
+                    foreach ($columnNames as $columnName) {
+
+                        // call "GeoDataMigration" that creates new columns,
+                        // inserts data from old columns into new columns and drop old geo address columns
+                        $connection->executeUpdate("CALL GeoDataMigration('{$table['name']}', '$databaseName', '$columnName')");
+
+                        // let's check does new column "geo_$columnName" exit or not
+                        $sthExist = $connection->prepare("CALL GeoExist('{$table['name']}', '$databaseName', 'geo_$columnName')");
+
+                        // give parameters
+                        $params['tableName'] = $table['name'];
+                        $params['database_name'] = $databaseName;
+                        $params['columnName'] = "geo_{$columnName}";
+
+                        // execute parameters
+                        $sthExist->execute($params);
+
+
+                        $exist = $sthExist->fetch();
+                        $sthExist->closeCursor();
+
+                        if (isset($exist['result']) && $exist['result'] > 0) {
+                            // get addresses id`s in project
+                            $addressCompany = "SELECT geo_" . $columnName . "
+											FROM " . $databaseName . "." . $table['name'] . "
+											WHERE geo_" . $columnName . " IS NOT NULL
 											";
-						$sthCompany = $connection->prepare("$addressCompany");
-						$sthCompany->execute();
-						$idsResults[] = $sthCompany->fetchAll();
-						$sthCompany->closeCursor();
-					}
-				}
-			}
-		}
-		$connection->commit();
-	}
-		//then something wrong
-	catch(\Exception $e)
-	{
-		//rollback to the previously stable state
-		$connection->rollback();
-		//restore database to its original state.
-		throw $e;
-	}
-		// get addresses id`s in project, get addresses string from main Geo project and insert or update in Yit:GeoBridgeBundle:Address
-		foreach($idsResults as $idResult) {
-			//get id from id`s
-			foreach ($idResult as $ids) {
+                            $sthCompany = $connection->prepare("$addressCompany");
+                            $sthCompany->execute();
+                            $idsResults[] = $sthCompany->fetchAll();
+                            $sthCompany->closeCursor();
+                        }
+                    }
+                }
+            }
+            $connection->commit();
+        } //then something wrong
+        catch (\Exception $e) {
+            //rollback to the previously stable state
+            $connection->rollback();
+            //restore database to its original state.
+            throw $e;
+        }
+        // get addresses id`s in project, get addresses string from main Geo project and insert or update in Yit:GeoBridgeBundle:Address
+        foreach ($idsResults as $idResult) {
+            //get id from id`s
+            foreach ($idResult as $ids) {
 
-				foreach ($ids as $id) {
+                foreach ($ids as $id) {
 
-					if (isset($id) && $id != null) {
-						// connect to main Geo project, get addresses by id
-						$addresses = $this->getContent(self::GEO_DOMAIN . 'api/addresses/' . $id . '');
+                    if (isset($id) && $id != null) {
+                        // connect to main Geo project, get addresses by id
+                        $addresses = $this->getContent(self::GEO_DOMAIN . 'api/addresses/' . $id . '');
 
-						if (isset($addresses->title) && $addresses->title != null) {
+                        if (isset($addresses->title) && $addresses->title != null) {
 
-							$address = $addresses->title;
-							// insert address in YitGeoBridgeBundle:Address
-							$connection->executeUpdate("CALL GeoDataModified($id , '$address')");
-						}
-						else {
-							$address = null;
-							// if address by id not exist address set null in YitGeoBridgeBundle:Address
-							$connection->executeUpdate("CALL GeoDataModified($id , '$address')");
-						}
-					}
-				}
-			}
-		}
+                            $address = $addresses->title;
+                            // insert address in YitGeoBridgeBundle:Address
+                            $connection->executeUpdate("CALL GeoDataModified($id , '$address')");
+                        } else {
+                            $address = null;
+                            // if address by id not exist address set null in YitGeoBridgeBundle:Address
+                            $connection->executeUpdate("CALL GeoDataModified($id , '$address')");
+                        }
+                    }
+                }
+            }
+        }
 
-		// create MySQL storage procedure
-		// This storage procedure create columns for relation, create relations, insert data, drop temp column`s
-		$geoDataRelation = "DROP PROCEDURE IF EXISTS `GeoRelation` ;
+        // create MySQL storage procedure
+        // This storage procedure create columns for relation, create relations, insert data, drop temp column`s
+        $geoDataRelation = "DROP PROCEDURE IF EXISTS `GeoRelation` ;
 						 CREATE PROCEDURE  `GeoRelation` ( IN  `tableName` VARCHAR( 255 ) ,
 															   IN  `dbName` VARCHAR( 255 ) ,
 															   IN  `columnName` VARCHAR( 255 ) )
@@ -283,43 +286,40 @@ class GeoMigrationCommand extends ContainerAwareCommand
                             END
 						";
 
-		//create GeoRelation storage procedure
-		$connection->executeUpdate($geoDataRelation, $margeParams);
+        //create GeoRelation storage procedure
+        $connection->executeUpdate($geoDataRelation, $margeParams);
 
-		$connection->beginTransaction();
-	try{
-		// get related tables
-		foreach ($tables as $table) {
+        $connection->beginTransaction();
+        try {
+            // get related tables
+            foreach ($tables as $table) {
 
-			//get related columns by tables
-			foreach ($table['columns'] as $columnNames) {
+                //get related columns by tables
+                foreach ($table['columns'] as $columnNames) {
 
-				foreach($columnNames as $columnName)
-				{
-					// call storage procedure is create new columns, relations, insert or update data, drop temp columns
-						$connection->executeUpdate("CALL GeoRelation('{$table['name']}', '$databaseName', 'geo_$columnName')");
-				}
-			}
-		}
-		$connection->commit();
-	}
-	//then something wrong
-	catch(\Exception $e)
-	{
-		//rollback to the previously stable state
-	$connection->rollback();
-		//restore database to its original state.
-	throw $e;
-	}
-		// drop storage procedures created for migration
-		$finishSql = "DROP PROCEDURE IF EXISTS  GeoDataMigration;
+                    foreach ($columnNames as $columnName) {
+                        // call storage procedure is create new columns, relations, insert or update data, drop temp columns
+                        $connection->executeUpdate("CALL GeoRelation('{$table['name']}', '$databaseName', 'geo_$columnName')");
+                    }
+                }
+            }
+            $connection->commit();
+        } //then something wrong
+        catch (\Exception $e) {
+            //rollback to the previously stable state
+            $connection->rollback();
+            //restore database to its original state.
+            throw $e;
+        }
+        // drop storage procedures created for migration
+        $finishSql = "DROP PROCEDURE IF EXISTS  GeoDataMigration;
 		DROP PROCEDURE IF EXISTS  GeoExist;
 		DROP PROCEDURE IF EXISTS  GeoRelation;
 		";
 
-		$connection->executeUpdate($finishSql, $margeParams);
+        $connection->executeUpdate($finishSql, $margeParams);
 
-		$output->writeln("<info>GeoBridgeBundle and Project migration success ..</info>");
-	}
+        $output->writeln("<info>GeoBridgeBundle and Project migration success ..</info>");
+    }
 
 }
