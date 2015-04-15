@@ -75,7 +75,7 @@ class GeoDataManagerCommand extends ContainerAwareCommand
 
 		// get updates in Geo
 		$modified = $this->getContent(self::GEO_DOMAIN . 'api/addresses/' . $dateTime . '/modified');
-//var_dump($modified); exit;
+//var_dump($dateTime, $modified); exit;
 		// start Transaction
 	$connection->beginTransaction();
 

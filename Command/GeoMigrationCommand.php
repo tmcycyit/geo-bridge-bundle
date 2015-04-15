@@ -15,8 +15,8 @@ use Symfony\Component\DependencyInjection\Container;
 
 class GeoMigrationCommand extends ContainerAwareCommand
 {
-	const GEO_DOMAIN = 'http://geo.yerevan.am/';
-//	const GEO_DOMAIN = 'http://geo.loc/app_dev.php/';
+//	const GEO_DOMAIN = 'http://geo.yerevan.am/';
+	const GEO_DOMAIN = 'http://geo.loc/app_dev.php/';
 
 	/**
 	 * This function is used to get content from $link
@@ -52,7 +52,7 @@ class GeoMigrationCommand extends ContainerAwareCommand
 	{
 		// definition of the command name and description
 		$this->setName('geo:address:migration')
-			 ->setDescription('GeoBridgeBundle synchronization data manager ');
+			 ->setDescription('GeoBridgeBundle geo address migration data manager ');
 	}
 
 	/**
@@ -153,7 +153,7 @@ class GeoMigrationCommand extends ContainerAwareCommand
 			// get entity table name
             $tmpData = array('name' => $em->getClassMetadata($entity)->getTableName(), 'columns' => array());
 
-			// get address columns if entity related to Yit:GeoBridgeBundle:Address
+			// get address columns if entity related to YitGeoBridgeBundle:Address
 			$coums = $em->getClassMetadata($entity)->getAssociationsByTargetClass('Yit\GeoBridgeBundle\Entity\Address');
 
 			if($coums && count($coums) > 0){
@@ -167,7 +167,6 @@ class GeoMigrationCommand extends ContainerAwareCommand
 		}
 
 		$connection->beginTransaction();
-
 	try{
 		// address id`s in project
 		$idsResults = array();
@@ -230,12 +229,12 @@ class GeoMigrationCommand extends ContainerAwareCommand
 						if (isset($addresses->title) && $addresses->title != null) {
 
 							$address = $addresses->title;
-							// insert address in Yit:GeoBridgeBundle:Address
+							// insert address in YitGeoBridgeBundle:Address
 							$connection->executeUpdate("CALL GeoDataModified($id , '$address')");
 						}
 						else {
 							$address = null;
-							// if address by id not exist address set null in Yit:GeoBridgeBundle:Address
+							// if address by id not exist address set null in YitGeoBridgeBundle:Address
 							$connection->executeUpdate("CALL GeoDataModified($id , '$address')");
 						}
 					}
@@ -289,6 +288,8 @@ class GeoMigrationCommand extends ContainerAwareCommand
 
 		//create GeoRelation storage procedure
 		$connection->executeUpdate($geoDataRelation, $margeParams);
+
+		$connection->beginTransaction();
 	try{
 		// get related tables
 		foreach ($tables as $table) {

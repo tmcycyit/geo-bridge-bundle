@@ -11,6 +11,7 @@ namespace Yit\GeoBridgeBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Response;
+use Yit\GeoBridgeBundle\Entity\Address;
 
 class GeoBridgeController extends Controller
 {
@@ -258,7 +259,36 @@ class GeoBridgeController extends Controller
      */
     public function putAddressAction($addressString)
     {
+		// get doctrine connection
+		$em = $this->getDoctrine()->getManager();
+
         $addressId = $this->get('yit_geo')->putAddress($addressString);
+
+		if(isset($addressId) && isset($addressString))
+		{
+			// get address by address id
+			$address = $em->getRepository('YitGeoBridgeBundle:Address')->findOneByAddressId($addressId);
+			// get last synchronization updated date time
+			$dateTime = $em->getRepository('YitGeoBridgeBundle:Address')->getLastUpdate();
+			// if exist address update
+			if(isset($address) && $address != null)
+			{
+				$address->setAddress($addressString);
+				$address->setCreated(new \DateTime($dateTime));
+				$address->setUpdated(new \DateTime($dateTime));
+				$em->persist($address);
+			}
+			else{
+				$address = new Address();
+				$address->setAddressId($addressId);
+				$address->setAddress($addressString);
+				$address->setCreated(new \DateTime($dateTime));
+				$address->setUpdated(new \DateTime($dateTime));
+				$em->persist($address);
+			}
+			
+			$em->flush();
+		}
 
         return new Response($addressId);
     }
