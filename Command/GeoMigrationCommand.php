@@ -62,7 +62,7 @@ class GeoMigrationCommand extends ContainerAwareCommand
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
 		// Begin run command
-		$output->writeln("<info>Starting synchronization GeoBridgeBundle and Geo data manager</info>");
+		$output->writeln("<info>Starting GeoBridgeBundle and Project migration</info>");
 
 		// get manager
 		$em = $this->getContainer()->get("doctrine")->getManager();
@@ -72,209 +72,256 @@ class GeoMigrationCommand extends ContainerAwareCommand
 		// use project database
 		$margeParams['db'] = $databaseName;
 
+		//This storage procedure to check exist column by database name, table name and column name
+		//if exist return 1 else return 0
+		$geoExistTable = "DROP PROCEDURE IF EXISTS `GeoExist` ;
+						 CREATE PROCEDURE  `GeoExist` ( IN  `tableName` VARCHAR( 255 ) ,
+															   IN  `dbName` VARCHAR( 255 ) ,
+															   IN  `columnName` VARCHAR( 255 ))
+						 COMMENT  'Check column' NOT DETERMINISTIC CONTAINS SQL SQL SECURITY DEFINER
+						 	BEGIN
+						DECLARE result INT(11);
+							IF EXISTS( SELECT NULL
+									  FROM INFORMATION_SCHEMA.COLUMNS
+									  WHERE table_name = tableName
+									  AND table_schema = dbName
+									  AND column_name = columnName)
+							THEN
+								SET result = 1;
+							ELSE
+								SET result = 0;
+							END IF;
+								SELECT result;
+						END
+						";
+
 		// create storage procedures MySql
-        //  create new temp column (by adding 'geo_' prefix) for migration by given database, table and column names.
-		$geoDataCreate = "DROP PROCEDURE IF EXISTS `GeoDataMigrationCreate` ;
-						 CREATE PROCEDURE  `GeoDataMigrationCreate` ( IN  `tableName` VARCHAR( 255 ) ,
-															   IN  `dbName` VARCHAR( 255 ) ,
-															   IN  `columnName` VARCHAR( 255 ) )
-						 COMMENT  'Create duplicated address column before column name add geo_' NOT DETERMINISTIC CONTAINS SQL SQL SECURITY DEFINER
-						 	BEGIN
-                                IF EXISTS( SELECT NULL
-                                    FROM INFORMATION_SCHEMA.COLUMNS
-                                    WHERE table_name = tableName
-                                    AND table_schema = dbName
-                                    AND column_name = columnName)
-                                THEN
-                                    SET @alter = CONCAT(  'ALTER TABLE ',tableName,' ADD geo_', columnName,' int(11);') ;
-                                    PREPARE stmt FROM @alter ;
-                                    EXECUTE stmt;
-                                END IF;
-                            END
-						";
-
-		// this storage procedure update column if exist column by parameters
-		// if exist geo address column insert data from geo address columns to new created column`s
-		$geoDataUpdate = "DROP PROCEDURE IF EXISTS `GeoDataMigrationUpdate` ;
-						 CREATE PROCEDURE  `GeoDataMigrationUpdate` ( IN  `tableName` VARCHAR( 255 ) ,
-															   IN  `dbName` VARCHAR( 255 ) ,
-															   IN  `columnName` VARCHAR( 255 ) )
-						 COMMENT  'Duplicated address data from geo address column to created column`s' NOT DETERMINISTIC CONTAINS SQL SQL SECURITY DEFINER
-						 	BEGIN
-                                IF EXISTS( SELECT NULL
-                                    FROM INFORMATION_SCHEMA.COLUMNS
-                                    WHERE table_name = tableName
-                                    AND table_schema = dbName
-                                    AND column_name = columnName)
-                                THEN
-                                    SET @update = CONCAT(  'UPDATE  ',tableName,' SET geo_', columnName,' = ', columnName,';') ;
-                                    PREPARE stmt FROM @update ;
-                                    EXECUTE stmt;
-                                END IF;
-                            END
-						";
-
-		// this storage procedure drop column if exist table by parameters
-		// if exist geo address column create, update and drop old geo address columns
+		//  create new temp column (by adding 'geo_' prefix) for migration by given database, table and column names.
+		// copy data from olt columns to new columns
+		// drop old columns
 		$geoDataDrop = "DROP PROCEDURE IF EXISTS `GeoDataMigration` ;
 						 CREATE PROCEDURE  `GeoDataMigration` ( IN  `tableName` VARCHAR( 255 ) ,
 															   IN  `dbName` VARCHAR( 255 ) ,
 															   IN  `columnName` VARCHAR( 255 ) )
-						 COMMENT  'Call GeoDataMigrationCreate and GeoDataMigrationUpdate stored procedures and Drop old addresses column`s' NOT DETERMINISTIC CONTAINS SQL SQL SECURITY DEFINER
+						 COMMENT  'Stored procedures crate, update and drop column`s' NOT DETERMINISTIC CONTAINS SQL SQL SECURITY DEFINER
 						 	BEGIN
-                                CALL GeoDataMigrationCreate(tableName, dbName, columnName);
-                                CALL GeoDataMigrationUpdate(tableName, dbName, columnName);
                                 IF EXISTS( SELECT NULL
                                     FROM INFORMATION_SCHEMA.COLUMNS
                                     WHERE table_name = tableName
                                     AND table_schema = dbName
                                     AND column_name = columnName)
                                 THEN
-                                    SET @drop = CONCAT(  'ALTER TABLE ',tableName,' DROP  ', columnName,';') ;
-                                    PREPARE stmt FROM @drop ;
-                                    EXECUTE stmt;
+                                	BEGIN
+										SET @alter = CONCAT(  'ALTER TABLE ',tableName,' ADD geo_', columnName,' int(11);') ;
+										PREPARE stmt FROM @alter ;
+										EXECUTE stmt;
+                                    END;
+                                    BEGIN
+										SET @update = CONCAT(  'UPDATE  ',tableName,' SET geo_', columnName,' = ', columnName,';') ;
+										PREPARE stmt FROM @update ;
+										EXECUTE stmt;
+                                    END;
+                                    BEGIN
+										SET @drop = CONCAT('ALTER TABLE ',tableName,' DROP  ', columnName,';') ;
+										PREPARE stmt FROM @drop ;
+										EXECUTE stmt;
+                                    END;
                                 END IF;
                             END
 						";
 
 		//create storage procedures
-		$connection->executeUpdate($geoDataCreate, $margeParams);
-		$connection->executeUpdate($geoDataUpdate, $margeParams);
+		$connection->executeUpdate($geoExistTable, $margeParams);
 		$connection->executeUpdate($geoDataDrop, $margeParams);
 
 		//get entity`as we used geo address
-		$entities = array('Company' => 'Ads\MainBundle\Entity\BaseCompany',
-						  'Place' => 'Ads\MainBundle\Entity\PlaceAddress',);
+		$entities = array();
+
+		// get all entity`s in project
+		$metas = $em->getMetadataFactory()->getAllMetadata();
+
+		foreach ($metas as $meta) {
+			// get entity`s names
+			$entities[] = $meta->getName();
+		}
 
 		$tables = array();
 
 		// find geo address fields
 		foreach ($entities as $className => $entity) {
 
-			// get entity name
+			// get entity table name
             $tmpData = array('name' => $em->getClassMetadata($entity)->getTableName(), 'columns' => array());
 
-			// get address columns
+			// get address columns if entity related to Yit:GeoBridgeBundle:Address
 			$coums = $em->getClassMetadata($entity)->getAssociationsByTargetClass('Yit\GeoBridgeBundle\Entity\Address');
 
-            if($coums && count($coums) > 0){
+			if($coums && count($coums) > 0){
 
                 foreach ($coums as $colum) {
                     // find join column field names
                     $tmpData['columns'][] = $colum['joinColumnFieldNames'];
                 }
-
                 $tables[] = $tmpData;
-            }
+			}
 		}
 
-        // LOOP ALL TABLES
+		$connection->beginTransaction();
+
+	try{
+		// address id`s in project
+		$idsResults = array();
+		// get table form tables
 		foreach ($tables as $table) {
-            foreach ($table['columns'] as $columnName) {
-                // if exist geo address column create new column`s storage procedure
+			// get columns by table
+            foreach ($table['columns'] as $columnNames) {
 
-                // call storage procedure is create new columns, insert data from old columns in new columns and drop old geo address column`s
-                $connection->executeUpdate("CALL GeoDataMigration('{$table['name']}', '$databaseName', '$columnName')");
-            }
+				foreach($columnNames as $columnName)
+				{
+					// call storage procedure is create new columns, insert data from old columns in new columns and drop old geo address column`s
+					$connection->executeUpdate("CALL GeoDataMigration('{$table['name']}', '$databaseName', '$columnName')");
+
+					// check exists tables
+					$sthExist = $connection->prepare("CALL GeoExist('{$table['name']}', '$databaseName', 'geo_$columnName')");
+					// give parameters
+					$params['tableName'] = $table['name'];
+					$params['database_name'] = $databaseName;
+					$params['columnName'] = $columnName;
+					// execute parameters
+					$sthExist->execute($params);
+					$exist = $sthExist->fetch();
+					$sthExist->closeCursor();
+
+					if(isset($exist['result']) && $exist['result'] >0){
+						// get addresses ids in project
+						$addressCompany = "SELECT geo_".$columnName."
+											FROM ".$databaseName.".".$table['name']."
+											WHERE geo_".$columnName." IS NOT NULL
+											";
+						$sthCompany = $connection->prepare("$addressCompany");
+						$sthCompany->execute();
+						$idsResults[] = $sthCompany->fetchAll();
+						$sthCompany->closeCursor();
+					}
+				}
+			}
 		}
+		$connection->commit();
+	}
+		//then something wrong
+	catch(\Exception $e)
+	{
+		//rollback to the previously stable state
+		$connection->rollback();
+		//restore database to its original state.
+		throw $e;
+	}
+		// get addresses id`s in project, get addresses string from main Geo project and insert or update in Yit:GeoBridgeBundle:Address
+		foreach($idsResults as $idResult) {
+			//get id from id`s
+			foreach ($idResult as $ids) {
 
-		// get all geo address in company table
-		$addressCompany = "SELECT geo_juridical_address, geo_working_address
-								FROM ads.company";
+				foreach ($ids as $id) {
 
-		$sthCompany = $connection->prepare("$addressCompany");
-		$sthCompany->execute();
-		$resultCompany = $sthCompany->fetchAll();
+					if (isset($id) && $id != null) {
+						// connect to main Geo project, get addresses by id
+						$addresses = $this->getContent(self::GEO_DOMAIN . 'api/addresses/' . $id . '');
 
-		// get all geo addresses in place_address table
-		$addressPlace = "SELECT geo_address
- 						FROM ads.place_address
- 						WHERE geo_address IS NOT NULL
- 						";
+						if (isset($addresses->title) && $addresses->title != null) {
 
-		$sthPlace = $connection->prepare("$addressPlace");
-		$sthPlace->execute();
-		$resultPlace = $sthPlace->fetchAll();
-		// get all geo addresses from ads project
-		$result = array_merge($resultCompany, $resultPlace);
-		// insert addresses in Geo Bridge Address table all project used addresses
-		for ($i = 0; $i < count($result); $i++) {
-
-			if(isset($result[$i]['geo_juridical_address'])){
-
-				$addressIdJuridical = $result[$i]['geo_juridical_address'];
-				// get address from Geo main project
-				$addressJuridical = $this->getContent(self::GEO_DOMAIN . 'api/addresses/' . $addressIdJuridical . '');
-
-				if (isset($addressJuridical) && $addressJuridical != null) {
-					// insert addresses in in Geo Bridge Address table
-					$connection->executeUpdate("CALL GeoDataModified($addressIdJuridical , '$addressJuridical->title')");
-				}
-				// if not exist address by id in Geo main project set null
-				else {
-					$addressJuridical = null;
-					// insert or update addresses in in Geo Bridge Address table
-					$connection->executeUpdate("CALL GeoDataModified($addressIdJuridical , '$addressJuridical')");
-				}
-			}
-			if(isset($result[$i]['geo_working_address'])) {
-
-				$addressIdWorking = $result[$i]['geo_working_address'];
-				// get address from Geo main project
-				$addressWorking = $this->getContent(self::GEO_DOMAIN . 'api/addresses/' . $addressIdWorking . '');
-
-				if (isset($addressWorking) && $addressWorking != null) {
-					// insert or update addresses in in Geo Bridge Address table
-					$connection->executeUpdate("CALL GeoDataModified($addressIdWorking , '$addressWorking->title')");
-				}
-				// if not exist address by id in Geo main project set null
-				else {
-					$addressWorking = null;
-					// insert or update addresses in in Geo Bridge Address table
-					$connection->executeUpdate("CALL GeoDataModified($addressIdWorking , '$addressWorking')");
-				}
-			}
-
-			if(isset($result[$i]['geo_address'])) {
-
-				$addressIdPlace = $result[$i]['geo_address'];
-				// get address from Geo main project
-				$addressPlace = $this->getContent(self::GEO_DOMAIN . 'api/addresses/' . $addressIdPlace . '');
-
-				if (isset($addressPlace) && $addressPlace != null) {
-					// insert addresses in in Geo Bridge Address table
-					$connection->executeUpdate("CALL GeoDataModified($addressIdPlace , '$addressPlace->title')");
-				}
-				// if not exist address by id in Geo main project set null
-				else {
-					$addressPlace = null;
-					// insert or update addresses in in Geo Bridge Address table
-					$connection->executeUpdate("CALL GeoDataModified($addressIdPlace , '$addressPlace')");
+							$address = $addresses->title;
+							// insert address in Yit:GeoBridgeBundle:Address
+							$connection->executeUpdate("CALL GeoDataModified($id , '$address')");
+						}
+						else {
+							$address = null;
+							// if address by id not exist address set null in Yit:GeoBridgeBundle:Address
+							$connection->executeUpdate("CALL GeoDataModified($id , '$address')");
+						}
+					}
 				}
 			}
 		}
 
-		$finishSql = "ALTER TABLE company ADD COLUMN (juridical_address INT( 11 ), working_address INT( 11 ));
-		ALTER TABLE place_address ADD COLUMN (address INT( 11 ));
-		ALTER TABLE place_address ADD CONSTRAINT FK_D1F4EB9A22589DE2 FOREIGN KEY (address) REFERENCES yit_geo_address (address_id) ON DELETE SET NULL ;
-		ALTER TABLE company ADD CONSTRAINT FK_D1F4EB9A22488DE2 FOREIGN KEY (juridical_address) REFERENCES yit_geo_address (address_id) ON DELETE SET NULL;
-		ALTER TABLE company ADD CONSTRAINT FK_D1F4EB9A13888DE3 FOREIGN KEY (working_address) REFERENCES yit_geo_address (address_id) ON DELETE SET NULL;
-		UPDATE company SET working_address = (
-						SELECT address_id FROM yit_geo_address WHERE address_id = geo_working_address);
-		UPDATE company SET juridical_address = (
-						SELECT address_id FROM yit_geo_address WHERE address_id = geo_juridical_address);
-		UPDATE place_address SET  address = (
-						SELECT address_id FROM yit_geo_address WHERE address_id = geo_address);
-		ALTER TABLE company DROP  geo_juridical_address, DROP  geo_working_address ;
-		ALTER TABLE place_address DROP  geo_address;
-		DROP PROCEDURE IF EXISTS  GeoDataMigrationCreate;
-		DROP PROCEDURE IF EXISTS  GeoDataMigrationUpdate;
-		DROP PROCEDURE IF EXISTS  GeoDataMigration;
+		// create MySQL storage procedure
+		// This storage procedure create columns for relation,
+		// create relations
+		// Insert data
+		// drop temp column`s
+		$geoDataRelation = "DROP PROCEDURE IF EXISTS `GeoRelation` ;
+						 CREATE PROCEDURE  `GeoRelation` ( IN  `tableName` VARCHAR( 255 ) ,
+															   IN  `dbName` VARCHAR( 255 ) ,
+															   IN  `columnName` VARCHAR( 255 ) )
+						 COMMENT  'stored procedures create relations, insert data, drop temp column`s ' NOT DETERMINISTIC CONTAINS SQL SQL SECURITY DEFINER
+						 	BEGIN
+						 		DECLARE mainColumn VARCHAR(255);
+                                IF EXISTS( SELECT NULL
+                                    FROM INFORMATION_SCHEMA.COLUMNS
+                                    WHERE table_name = tableName
+                                    AND table_schema = dbName
+                                    AND column_name = columnName)
+                                THEN
+								SET mainColumn = SUBSTRING(columnName, 5);
+                                	BEGIN
+										SET @alter = CONCAT('ALTER TABLE ',tableName,' ADD ', mainColumn,' int(11);') ;
+										PREPARE stmt FROM @alter ;
+										EXECUTE stmt;
+                                    END;
+                                    BEGIN
+										SET @relation = CONCAT( 'ALTER TABLE ',tableName,' ADD CONSTRAINT FK_D1F', mainColumn,' FOREIGN KEY (', mainColumn,') REFERENCES yit_geo_address (address_id) ON DELETE SET NULL;') ;
+										PREPARE stmt FROM @relation ;
+										EXECUTE stmt;
+                                    END;
+                                    BEGIN
+										SET @update = CONCAT(	'UPDATE ',tableName,' SET ',mainColumn,' = (
+																SELECT address_id FROM yit_geo_address WHERE address_id = ', columnName,');');
+										PREPARE stmt FROM @update ;
+										EXECUTE stmt;
+                                    END;
+                                    BEGIN
+										SET @drop = CONCAT( 'ALTER TABLE ',tableName,' DROP ',columnName,' ') ;
+										PREPARE stmt FROM @drop ;
+										EXECUTE stmt;
+                                    END;
+                                END IF;
+                            END
+						";
+
+		//create GeoRelation storage procedure
+		$connection->executeUpdate($geoDataRelation, $margeParams);
+	try{
+		// get related tables
+		foreach ($tables as $table) {
+
+			//get related columns by tables
+			foreach ($table['columns'] as $columnNames) {
+
+				foreach($columnNames as $columnName)
+				{
+					// call storage procedure is create new columns, relations, insert or update data, drop temp columns
+						$connection->executeUpdate("CALL GeoRelation('{$table['name']}', '$databaseName', 'geo_$columnName')");
+				}
+			}
+		}
+		$connection->commit();
+	}
+	//then something wrong
+	catch(\Exception $e)
+	{
+		//rollback to the previously stable state
+	$connection->rollback();
+		//restore database to its original state.
+	throw $e;
+	}
+		// drop storage procedures created for migration
+		$finishSql = "DROP PROCEDURE IF EXISTS  GeoDataMigration;
+		DROP PROCEDURE IF EXISTS  GeoExist;
+		DROP PROCEDURE IF EXISTS  GeoRelation;
 		";
 
 		$connection->executeUpdate($finishSql, $margeParams);
 
-		$output->writeln("<info>GeoBridgeBundle and Geo synchronization success ..</info>");
+		$output->writeln("<info>GeoBridgeBundle and Project migration success ..</info>");
 	}
 
 }
