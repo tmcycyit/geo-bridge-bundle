@@ -192,8 +192,6 @@ class GeoMigrationCommand extends ContainerAwareCommand
 
                         // execute parameters
                         $sthExist->execute($params);
-
-
                         $exist = $sthExist->fetch();
                         $sthExist->closeCursor();
 
@@ -219,6 +217,7 @@ class GeoMigrationCommand extends ContainerAwareCommand
             //restore database to its original state.
             throw $e;
         }
+
         // get addresses id`s in project, get addresses string from main Geo project and insert or update in Yit:GeoBridgeBundle:Address
         foreach ($idsResults as $idResult) {
             //get id from id`s
@@ -230,16 +229,15 @@ class GeoMigrationCommand extends ContainerAwareCommand
                         // connect to main Geo project, get addresses by id
                         $addresses = $this->getContent(self::GEO_DOMAIN . 'api/addresses/' . $id . '');
 
+                        // checking address title
                         if (isset($addresses->title) && $addresses->title != null) {
-
                             $address = $addresses->title;
-                            // insert address in YitGeoBridgeBundle:Address
-                            $connection->executeUpdate("CALL GeoDataModified($id , '$address')");
                         } else {
                             $address = null;
-                            // if address by id not exist address set null in YitGeoBridgeBundle:Address
-                            $connection->executeUpdate("CALL GeoDataModified($id , '$address')");
                         }
+
+                        // insert address in YitGeoBridgeBundle:Address
+                        $connection->executeUpdate("CALL GeoDataModified($id , '$address')");
                     }
                 }
             }
@@ -247,8 +245,8 @@ class GeoMigrationCommand extends ContainerAwareCommand
 
         // create MySQL storage procedure
         // This storage procedure create columns for relation, create relations, insert data, drop temp column`s
-        $geoDataRelation = "DROP PROCEDURE IF EXISTS `GeoRelation` ;
-						 CREATE PROCEDURE  `GeoRelation` ( IN  `tableName` VARCHAR( 255 ) ,
+        $geoDataRelation = "DROP PROCEDURE IF EXISTS `CreateGeoRelation` ;
+						 CREATE PROCEDURE  `CreateGeoRelation` ( IN  `tableName` VARCHAR( 255 ) ,
 															   IN  `dbName` VARCHAR( 255 ) ,
 															   IN  `columnName` VARCHAR( 255 ) )
 						 COMMENT  'stored procedures create relations, insert data, drop temp column`s ' NOT DETERMINISTIC CONTAINS SQL SQL SECURITY DEFINER
@@ -286,10 +284,11 @@ class GeoMigrationCommand extends ContainerAwareCommand
                             END
 						";
 
-        //create GeoRelation storage procedure
+        //create CreateGeoRelation storage procedure
         $connection->executeUpdate($geoDataRelation, $margeParams);
 
         $connection->beginTransaction();
+
         try {
             // get related tables
             foreach ($tables as $table) {
@@ -299,7 +298,7 @@ class GeoMigrationCommand extends ContainerAwareCommand
 
                     foreach ($columnNames as $columnName) {
                         // call storage procedure is create new columns, relations, insert or update data, drop temp columns
-                        $connection->executeUpdate("CALL GeoRelation('{$table['name']}', '$databaseName', 'geo_$columnName')");
+                        $connection->executeUpdate("CALL CreateGeoRelation('{$table['name']}', '$databaseName', 'geo_$columnName')");
                     }
                 }
             }
@@ -311,10 +310,11 @@ class GeoMigrationCommand extends ContainerAwareCommand
             //restore database to its original state.
             throw $e;
         }
+
         // drop storage procedures created for migration
         $finishSql = "DROP PROCEDURE IF EXISTS  GeoDataMigration;
 		DROP PROCEDURE IF EXISTS  GeoExist;
-		DROP PROCEDURE IF EXISTS  GeoRelation;
+		DROP PROCEDURE IF EXISTS  CreateGeoRelation;
 		";
 
         $connection->executeUpdate($finishSql, $margeParams);
