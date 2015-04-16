@@ -164,13 +164,14 @@ class GeoMigrationCommand extends ContainerAwareCommand
                 $tables[] = $tmpData;
             }
         }
-
+		// stare transaction
         $connection->beginTransaction();
 
         try {
             // address id`s in project
             $idsResults = array();
 
+//			$exist = array();
             // get table form tables
             foreach ($tables as $table) {
                 // get columns by table
@@ -183,15 +184,14 @@ class GeoMigrationCommand extends ContainerAwareCommand
                         $connection->executeUpdate("CALL GeoDataMigration('{$table['name']}', '$databaseName', '$columnName')");
 
                         // let's check does new column "geo_$columnName" exit or not
-                        $sthExist = $connection->prepare("CALL GeoExist('{$table['name']}', '$databaseName', 'geo_$columnName')");
+                        $sthExist = $connection->prepare("CALL GeoExist(?, ?, ?)");
 
-                        // give parameters
-                        $params['tableName'] = $table['name'];
-                        $params['database_name'] = $databaseName;
-                        $params['columnName'] = "geo_{$columnName}";
+						$newColumnName = 'geo_'.$columnName;
 
-                        // execute parameters
-                        $sthExist->execute($params);
+						$sthExist->bindParam(1, $table['name'], \PDO::PARAM_STR|\PDO::PARAM_INPUT_OUTPUT, 50);
+						$sthExist->bindParam(2, $databaseName, \PDO::PARAM_STR|\PDO::PARAM_INPUT_OUTPUT, 50);
+						$sthExist->bindParam(3, $newColumnName, \PDO::PARAM_STR|\PDO::PARAM_INPUT_OUTPUT, 50);
+                        $sthExist->execute();
                         $exist = $sthExist->fetch();
                         $sthExist->closeCursor();
 
@@ -202,15 +202,18 @@ class GeoMigrationCommand extends ContainerAwareCommand
 											WHERE geo_" . $columnName . " IS NOT NULL
 											";
                             $sthCompany = $connection->prepare("$addressCompany");
-                            $sthCompany->execute();
+
+							$sthCompany->execute();
                             $idsResults[] = $sthCompany->fetchAll();
                             $sthCompany->closeCursor();
                         }
                     }
                 }
             }
-            $connection->commit();
-        } //then something wrong
+
+			$connection->commit();
+        }
+        //then something wrong
         catch (\Exception $e) {
             //rollback to the previously stable state
             $connection->rollback();
