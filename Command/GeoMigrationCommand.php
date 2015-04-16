@@ -171,7 +171,6 @@ class GeoMigrationCommand extends ContainerAwareCommand
             // address id`s in project
             $idsResults = array();
 
-//			$exist = array();
             // get table form tables
             foreach ($tables as $table) {
                 // get columns by table
@@ -220,7 +219,6 @@ class GeoMigrationCommand extends ContainerAwareCommand
             //restore database to its original state.
             throw $e;
         }
-
         // get addresses id`s in project, get addresses string from main Geo project and insert or update in Yit:GeoBridgeBundle:Address
         foreach ($idsResults as $idResult) {
             //get id from id`s
@@ -230,17 +228,21 @@ class GeoMigrationCommand extends ContainerAwareCommand
 
                     if (isset($id) && $id != null) {
                         // connect to main Geo project, get addresses by id
-                        $addresses = $this->getContent(self::GEO_DOMAIN . 'api/addresses/' . $id . '');
+						$address = $em->getRepository('YitGeoBridgeBundle:Address')->findOneByAddressId($id);
+						$addresses = null;
+						// checking address title
+						if(is_null($address)){
+							$addresses = $this->getContent(self::GEO_DOMAIN . 'api/addresses/' . $id . '');
 
-                        // checking address title
-                        if (isset($addresses->title) && $addresses->title != null) {
-                            $address = $addresses->title;
-                        } else {
-                            $address = null;
-                        }
+							if (isset($addresses->title) && $addresses->title != null) {
+								$address = $addresses->title;
+							} else {
+								$address = null;
+							}
 
-                        // insert address in YitGeoBridgeBundle:Address
-                        $connection->executeUpdate("CALL GeoDataModified($id , '$address')");
+							// insert address in YitGeoBridgeBundle:Address
+							$connection->executeUpdate("CALL GeoDataModified($id , '$address')");
+						}
                     }
                 }
             }
