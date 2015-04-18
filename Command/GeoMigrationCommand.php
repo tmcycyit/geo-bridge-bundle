@@ -165,6 +165,7 @@ class GeoMigrationCommand extends ContainerAwareCommand
                 $tables[] = $tmpData;
             }
         }
+//		var_dump($tables); exit;
 		// stare transaction
         $connection->beginTransaction();
 
@@ -271,13 +272,13 @@ class GeoMigrationCommand extends ContainerAwareCommand
 										EXECUTE stmt;
                                     END;
                                     BEGIN
-										SET @relation = CONCAT( 'ALTER TABLE ',tableName,' ADD CONSTRAINT FK_D1F', mainColumn,' FOREIGN KEY (', mainColumn,') REFERENCES yit_geo_address (address_id) ON DELETE SET NULL;') ;
+										SET @relation = CONCAT( 'ALTER TABLE ',tableName,' ADD CONSTRAINT FK_D1F', mainColumn,' FOREIGN KEY (', mainColumn,') REFERENCES yit_geo_address (id) ON DELETE SET NULL;') ;
 										PREPARE stmt FROM @relation ;
 										EXECUTE stmt;
                                     END;
                                     BEGIN
 										SET @update = CONCAT('UPDATE ',tableName,' SET ',mainColumn,' = (
-																SELECT address_id FROM yit_geo_address WHERE address_id = ', columnName,');');
+																SELECT id FROM yit_geo_address WHERE id = ', columnName,');');
 										PREPARE stmt FROM @update ;
 										EXECUTE stmt;
                                     END;

@@ -19,18 +19,9 @@ use JMS\Serializer\Annotation\Type;
 class Address
 {
     /**
+	 * @ORM\Id
      * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="address_id", type="integer", unique=true)
+     * @ORM\Column(name="id", type="integer", unique=true)
      */
     private $addressId;
 
@@ -56,16 +47,6 @@ class Address
 	 * @ORM\Column(type="datetime")
 	 */
 	private $updated;
-
-    /**
-     * Get id
-     *
-     * @return integer 
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
 
     /**
      * Set addressId

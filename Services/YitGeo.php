@@ -8,7 +8,11 @@
 
 namespace Yit\GeoBridgeBundle\Services;
 
+use Doctrine\ORM\EntityManager;
+use FOS\RestBundle\Util\Codes;
+use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 
 class YitGeo
@@ -21,10 +25,13 @@ class YitGeo
 
     protected $container;
 
-    public function __construct(Container $container)
+	protected $entityManager;
+
+    public function __construct(Container $container, EntityManager $entityManager)
     {
         $this->container = $container;
         $this->experience = $this->container->getParameter('yit_geo_bridge.experience');
+		$this->em = $entityManager;
     }
 
 
@@ -79,6 +86,7 @@ class YitGeo
      */
     public function getAddressById($id)
     {
+
         $address = apc_fetch('address_' . $id);
 
         if ($address === false)
@@ -459,4 +467,26 @@ class YitGeo
 
         return $this->getContent(self::GEO_DOMAIN . 'api/streets/' . $search . '/search/' . $limit . '/' . $district);
     }
+
+	/**
+	 * This service return address object by addressId
+	 *
+	 * @param $id
+	 * @return mixed
+	 */
+	public function getAddressByIdObject($id)
+	{
+		// get address by id
+		$address = $this->em->getRepository('YitGeoBridgeBundle:Address')->findOneByAddressId($id);
+
+		if(isset($address) && $address != null)
+		{
+			// return address object
+			return $address;
+		}
+		else{
+			// is not exist address return exception NOT_FOUND
+			throw new HttpException(Codes::HTTP_NOT_FOUND, 'Address not found in YitGeoBridgeBundle:Address entity');
+		}
+	}
 }

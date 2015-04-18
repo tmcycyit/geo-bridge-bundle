@@ -50,14 +50,14 @@ class GeoStoredProcedureCommand extends ContainerAwareCommand
 							START TRANSACTION;
 
 						 SELECT id INTO geo_address_id
-						FROM  `yit_geo_address` WHERE address_id = real_id;
+						FROM  `yit_geo_address` WHERE id = real_id;
 
 						IF geo_address_id > -1 THEN
-						UPDATE  `yit_geo_address` SET address = address, updated = NOW() WHERE address_id = real_id;
+						UPDATE  `yit_geo_address` SET address = address, updated = NOW() WHERE id = real_id;
 						ELSE
-						INSERT INTO  `yit_geo_address` (  `id` ,  `address_id` ,  `address` ,  `created` ,  `updated` )
+						INSERT INTO  `yit_geo_address` (  `id` , `address` ,  `created` ,  `updated` )
 						VALUES (
-						NULL , real_id, address, NOW( ) , NOW( )
+							real_id, address, NOW( ) , NOW( )
 						);
 						END IF ;
 						COMMIT ;
@@ -86,7 +86,7 @@ class GeoStoredProcedureCommand extends ContainerAwareCommand
                      	WHERE ', column_name,  '= ',merged_id,'') ;
 						PREPARE stmt FROM @update ;
 						EXECUTE stmt;
-						DELETE FROM yit_geo_address WHERE yit_geo_address.address_id = merged_id;
+						DELETE FROM yit_geo_address WHERE yit_geo_address.id = merged_id;
 							COMMIT ;
 						END";
 
