@@ -13,6 +13,7 @@ use FOS\RestBundle\Util\Codes;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Yit\GeoBridgeBundle\Entity\Address;
 
 
 class YitGeo
@@ -485,8 +486,27 @@ class YitGeo
 			return $address;
 		}
 		else{
-			// is not exist address return exception NOT_FOUND
-			throw new HttpException(Codes::HTTP_NOT_FOUND, 'Address not found in YitGeoBridgeBundle:Address entity');
-		}
+			// get address from Geo Main project
+			$addresses = $this->getContent(self::GEO_DOMAIN . 'api/addresses/' . $id . '');
+
+				if (isset($addresses->title) && $addresses->title != null) {
+
+					$dateTime = $this->em->getRepository('YitGeoBridgeBundle:Address')->getLastUpdate();
+					// create address in yit geo bridge
+					$address = new Address();
+					$address->setAddressId($id);
+					$address->setAddress($addresses->title);
+					$address->setCreated(new \DateTime($dateTime));
+					$address->setUpdated(new \DateTime($dateTime));
+					$this->em->persist($address);
+					$this->em->flush();
+
+					return $address;
+				}
+					else {
+
+						throw new HttpException(Codes::HTTP_NOT_FOUND, 'Address not found in YitGeoBridgeBundle:Address entity');
+					}
+			}
 	}
 }
