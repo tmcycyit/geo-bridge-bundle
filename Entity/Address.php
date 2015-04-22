@@ -69,6 +69,14 @@ class Address
 	 */
 	private $updated;
 
+	/**
+	 * @return string
+	 */
+	public function __toString()
+	{
+		return ($this->armName) ? $this->armName: '';
+	}
+
     /**
      * Set addressId
      *
