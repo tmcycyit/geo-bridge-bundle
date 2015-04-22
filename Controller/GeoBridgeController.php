@@ -274,7 +274,7 @@ class GeoBridgeController extends Controller
 			if(isset($address) && $address != null)
 			{
 				// update address in YitGeoBridgeBundle
-				$address->setAddress($addressString);
+				$address->setArmName($addressString);
 				$address->setCreated(new \DateTime($dateTime));
 				$address->setUpdated(new \DateTime($dateTime));
 				$em->persist($address);
@@ -283,7 +283,7 @@ class GeoBridgeController extends Controller
 				// insert address in YitGeoBridgeBundle
 				$address = new Address();
 				$address->setAddressId($addressId);
-				$address->setAddress($addressString);
+				$address->setArmName($addressString);
 				$address->setCreated(new \DateTime($dateTime));
 				$address->setUpdated(new \DateTime($dateTime));
 				$em->persist($address);

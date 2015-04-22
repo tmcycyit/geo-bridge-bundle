@@ -11,10 +11,10 @@
 
     <services>
 
-        <service id="geo.event.listener" class="Yit\GeoBridgeBundle\Listener\GeoEventListener">
-            <argument type="service" id="service_container" />
-            <tag name="doctrine.event_listener" event="postLoad"/>
-        </service>
+        <!--<service id="geo.event.listener" class="Yit\GeoBridgeBundle\Listener\GeoEventListener">-->
+            <!--<argument type="service" id="service_container" />-->
+            <!--<tag name="doctrine.event_listener" event="postLoad"/>-->
+        <!--</service>-->
 
         <service id="yit_geo" class="Yit\GeoBridgeBundle\Services\YitGeo">
             <argument type="service" id="service_container" />

@@ -25,12 +25,33 @@ class Address
      */
     private $addressId;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="address", type="string", length=255)
-     */
-    private $address;
+	/**
+	 * @var string
+	 *
+	 * @Assert\Regex(pattern="/^(([Ա-ՖՈՉՊՋՍՎՏՐՑՒՓՔՕա-ֆևփւրցքօ\֊\.․, \/\s0-9]{0,})){1,1}$/i", message="Street Arm name type is invalid")
+	 * @ORM\Column(name="arm_name", type="string", length=255, nullable=true)
+	 */
+	private $armName;
+
+	/**
+	 * @var string
+	 *
+	 * @Assert\Regex(pattern="/^([A-z\֊\.․, 0-9]{0,}){1,1}$/i", message="Street Eng name type is invalid")
+	 * @ORM\Column(name="eng_name", type="string", length=255, nullable=true)
+	 */
+	private $engName;
+
+	/**
+	 * @var string
+	 * @ORM\Column(name="latitude", type="decimal", precision=10, scale=7, nullable=true)
+	 */
+	private $latitude;
+
+	/**
+	 * @var string
+	 * @ORM\Column(name="longitude", type="decimal", precision=10, scale=7, nullable=true)
+	 */
+	private $longitude;
 
 	/**
 	 * @var datetime $created
@@ -69,29 +90,6 @@ class Address
     public function getAddressId()
     {
         return $this->addressId;
-    }
-
-    /**
-     * Set address
-     *
-     * @param string $address
-     * @return Address
-     */
-    public function setAddress($address)
-    {
-        $this->address = $address;
-    
-        return $this;
-    }
-
-    /**
-     * Get address
-     *
-     * @return string 
-     */
-    public function getAddress()
-    {
-        return $this->address;
     }
 
 	/**
@@ -139,4 +137,96 @@ class Address
 	{
 		return $this->updated;
 	}
+
+	/**
+	 * Set latitude
+	 *
+	 * @param string $latitude
+	 * @return Address
+	 */
+	public function setLatitude($latitude)
+	{
+		$this->latitude = $latitude;
+
+		return $this;
+	}
+
+	/**
+	 * Get latitude
+	 *
+	 * @return string
+	 */
+	public function getLatitude()
+	{
+		return $this->latitude;
+	}
+
+	/**
+	 * Set longitude
+	 *
+	 * @param string $longitude
+	 * @return Address
+	 */
+	public function setLongitude($longitude)
+	{
+		$this->longitude = $longitude;
+
+		return $this;
+	}
+
+	/**
+	 * Get longitude
+	 *
+	 * @return string
+	 */
+	public function getLongitude()
+	{
+		return $this->longitude;
+	}
+
+	/**
+	 * Set armName
+	 *
+	 * @param  string $armName
+	 * @return Address
+	 */
+	public function setArmName($armName)
+	{
+		$this->armName = $armName;
+		return $this;
+	}
+
+	/**
+	 * Get armName
+	 *
+	 * @return string
+	 */
+	public function getArmName()
+	{
+		return $this->armName;
+	}
+
+	/**
+	 * Set engName
+	 *
+	 * @param  string $engName
+	 * @return Address
+	 */
+	public function setEngName($engName)
+	{
+		$this->engName = $engName;
+		return $this;
+	}
+
+	/**
+	 * Get engName
+	 *
+	 * @return string
+	 */
+	public function getEngName()
+	{
+		return $this->engName;
+	}
+
+
 }

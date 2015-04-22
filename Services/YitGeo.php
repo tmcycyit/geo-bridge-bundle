@@ -19,8 +19,8 @@ use Yit\GeoBridgeBundle\Entity\Address;
 class YitGeo
 {
 //    const GEO_DOMAIN = 'http://geo.yerevan.am/';
-	const GEO_DOMAIN = 'http://dev.geo.yerevan.am/';
-//    const GEO_DOMAIN = 'http://geo.loc/app_dev.php/';
+//	const GEO_DOMAIN = 'http://dev.geo.yerevan.am/';
+    const GEO_DOMAIN = 'http://geo.loc/app_dev.php/';
 
     protected $experience;
 
@@ -92,9 +92,17 @@ class YitGeo
 
         if ($address === false)
         {
-            $address = $this->getContent(self::GEO_DOMAIN . 'api/addresses/' . $id);
-            //Store address in cache 24 hours
-            apc_add('address_' . $id, $address, $this->experience);
+//			$address = $this->em->getRepository('YitGeoBridgeBundle:Address')->findOneByAddressId($id);
+
+			if(isset($address) && $address != null){
+				$address = $address->getAddress();
+			}
+			else {
+				$address = $this->getContent(self::GEO_DOMAIN . 'api/addresses/' . $id);
+				//Store address in cache 24 hours
+			}
+			apc_add('address_' . $id, $address, $this->experience);
+
         }
 
         return $address;
@@ -482,7 +490,7 @@ class YitGeo
 
 		if(isset($address) && $address != null)
 		{
-			// return address object
+			// return address object if exist in YitGeoBridgeBundle:Address entity
 			return $address;
 		}
 		else{
@@ -492,19 +500,23 @@ class YitGeo
 				if (isset($addresses->title) && $addresses->title != null) {
 
 					$dateTime = $this->em->getRepository('YitGeoBridgeBundle:Address')->getLastUpdate();
-					// create address in yit geo bridge
+
+						// create address in yit geo bridge
 					$address = new Address();
 					$address->setAddressId($id);
-					$address->setAddress($addresses->title);
+					$address->setArmName($addresses->title);
+					$address->setEngName($addresses->eng_title);
+					$address->setLatitude($addresses->latitude);
+					$address->setLongitude($addresses->longitude);
 					$address->setCreated(new \DateTime($dateTime));
 					$address->setUpdated(new \DateTime($dateTime));
 					$this->em->persist($address);
 					$this->em->flush();
 
+					// return created address object
 					return $address;
-				}
-					else {
-
+				}else
+					{
 						throw new HttpException(Codes::HTTP_NOT_FOUND, 'Address not found in YitGeoBridgeBundle:Address entity');
 					}
 			}

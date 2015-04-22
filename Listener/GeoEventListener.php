@@ -41,59 +41,62 @@ class GeoEventListener
         //============================ Addresses ==================================
         //=========================================================================
 
-        if ($entity instanceof AddressChangeableInterface)
-        {
-            $address = $this->container->get('yit_geo')->getAddressById($entity->getAddressId());
-
-            if ($address && $address->id != $entity->getAddressId())
-            {
-                $em = $this->container->get('doctrine')->getManager();
-                $query = $em->createQuery("UPDATE ". get_class($entity). " a  SET a."
-                    . $entity->getAddressField() ." = "
-                    . $address->id. " WHERE a.id =  " . $entity->getId());
-                $query->execute();
-            }
-        }
-
-        // inject single address
-        if ($entity instanceof AddressableInterface)
-        {
-            $address = $this->container->get('yit_geo')->getAddressById($entity->getAddressId());
-
-            if ($address)
-            {
-                if (isset($address->title)) {
-                    $entity->setAddressTitle($address->title);
-                }
-                if (isset($address->latitude)) {
-                    $entity->setAddresLatitude($address->latitude);
-                }
-                if (isset($address->longitude)) {
-                    $entity->setAddresLongitude($address->longitude);
-                }
-                if (isset($address->eng_type)) {
-                    $entity->setAddressEngType($address->eng_type);
-                }
-                if (isset($address->h_number)) {
-                    $entity->setAddressHNumber($address->h_number);
-                }
-
-            }
-        }
-
-        // inject multi address
-        if ($entity instanceof MultiAddressableInterface)
-        {
-            $addresses = array();
-
-            foreach($entity->getAddressIds() as $id){
-                if($id){
-                    $addresses[$id] = $this->container->get('yit_geo')->getAddressById($id);
-                }
-            }
-
-            $entity->setAddresses($addresses);
-        }
+//        if ($entity instanceof AddressChangeableInterface)
+//        {
+//            $address = $this->container->get('yit_geo')->getAddressById($entity->getAddressId());
+//
+//            if ($address && $address->id != $entity->getAddressId())
+//            {
+//                $em = $this->container->get('doctrine')->getManager();
+//                $query = $em->createQuery("UPDATE ". get_class($entity). " a  SET a."
+//                    . $entity->getAddressField() ." = "
+//                    . $address->id. " WHERE a.id =  " . $entity->getId());
+//                $query->execute();
+//            }
+//        }
+//
+//        // inject single address
+//        if ($entity instanceof AddressableInterface)
+//        {
+//            $address = $this->container->get('yit_geo')->getAddressById($entity->getAddressId());
+//
+//            if ($address)
+//            {
+//                if (isset($address->title)) {
+//                    $entity->setAddressTitle($address->title);
+//                }
+//                if (isset($address->latitude)) {
+//                    $entity->setAddresLatitude($address->latitude);
+//                }
+//                if (isset($address->longitude)) {
+//                    $entity->setAddresLongitude($address->longitude);
+//                }
+//                if (isset($address->eng_type)) {
+//                    $entity->setAddressEngType($address->eng_type);
+//                }
+//                if (isset($address->h_number)) {
+//                    $entity->setAddressHNumber($address->h_number);
+//                }
+//
+//            }
+//        }
+//
+//        // inject multi address
+//        if ($entity instanceof MultiAddressableInterface)
+//        {
+//            $addresses = array();
+//
+//            foreach($entity->getAddressIds() as $id){
+//                if($id){
+//
+//					$id = $id->getAddressId();
+//
+//                    $addresses[$id] = $this->container->get('yit_geo')->getAddressById($id);
+//                }
+//            }
+//
+//            $entity->setAddresses($addresses);
+//        }
 
         //=========================================================================
         //============================ Districts ==================================

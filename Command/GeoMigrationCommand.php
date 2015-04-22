@@ -16,8 +16,8 @@ use Symfony\Component\DependencyInjection\Container;
 class GeoMigrationCommand extends ContainerAwareCommand
 {
 //    const GEO_DOMAIN = 'http://geo.yerevan.am/';
-    const GEO_DOMAIN = 'http://dev.geo.yerevan.am/';
-//	const GEO_DOMAIN = 'http://geo.loc/app_dev.php/';
+//    const GEO_DOMAIN = 'http://dev.geo.yerevan.am/';
+	const GEO_DOMAIN = 'http://geo.loc/app_dev.php/';
 
     /**
      * This function is used to get content from $link
@@ -165,7 +165,7 @@ class GeoMigrationCommand extends ContainerAwareCommand
                 $tables[] = $tmpData;
             }
         }
-//		var_dump($tables); exit;
+
 		// stare transaction
         $connection->beginTransaction();
 
@@ -237,13 +237,19 @@ class GeoMigrationCommand extends ContainerAwareCommand
 							$addresses = $this->getContent(self::GEO_DOMAIN . 'api/addresses/' . $id . '');
 
 							if (isset($addresses->title) && $addresses->title != null) {
-								$address = $addresses->title;
+								$addressArm = $addresses->title;
+								$addressEng = $addresses->eng_title;
+								$latitude = $addresses->latitude;
+								$longitude = $addresses->longitude;
 							} else {
-								$address = null;
+								$addressArm = null;
+								$addressEng = null;
+								$latitude = null;
+								$longitude = null;
 							}
 
 							// insert address in YitGeoBridgeBundle:Address
-							$connection->executeUpdate("CALL GeoDataModified($id , '$address')");
+							$connection->executeUpdate("CALL GeoDataModified($id , '$addressArm', '$addressEng', '$latitude', '$longitude')");
 						}
                     }
                 }

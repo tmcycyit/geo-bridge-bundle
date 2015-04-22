@@ -15,8 +15,8 @@ use Symfony\Component\DependencyInjection\Container;
 class GeoDataManagerCommand extends ContainerAwareCommand
 {
 //	const GEO_DOMAIN = 'http://geo.yerevan.am/';
-	const GEO_DOMAIN = 'http://dev.geo.yerevan.am/';
-//	const GEO_DOMAIN = 'http://geo.loc/app_dev.php/';
+//	const GEO_DOMAIN = 'http://dev.geo.yerevan.am/';
+	const GEO_DOMAIN = 'http://geo.loc/app_dev.php/';
 
 	/**
 	 * This function is used to get content from $link
@@ -93,8 +93,14 @@ class GeoDataManagerCommand extends ContainerAwareCommand
 
 				if(isset($bridgeAddress) && $bridgeAddress != null){
 
-					// get matching address and update, if address isset
-					$connection->executeUpdate("CALL GeoDataModified($object->id , '$object->address')");
+					$id = $object->id;
+					$addressArm = $object->armAddress;
+					$addressEng = $object->engAddress;
+					$latitude = $object->latitude;
+					$longitude = $object->longitude;
+
+					// call GeoDataModified storage procedure by modified object parameters
+					$connection->executeUpdate("CALL GeoDataModified($id , '$addressArm', '$addressEng', '$latitude', '$longitude')");
 				}
 			}
 		}
@@ -127,8 +133,15 @@ class GeoDataManagerCommand extends ContainerAwareCommand
 
 				for ($j = 0; $j < count($merge); $j++) {
 
-					// Call Geo Data Manager
-					$connection->executeUpdate("CALL GeoDataManager('$table', '$columnName', '" . $merge[$j]->merged_id . "', '" . $merge[$j]->real_id . "' ,	'" . $merge[$j]->address . "')");
+					$mergedId = $merge[$j]->merged_id;
+					$realId = $merge[$j]->real_id;
+					$addressArm = $merge[$j]->armAddress;
+					$addressEng = $merge[$j]->engAddress;
+					$latitude = $merge[$j]->latitude;
+					$longitude = $merge[$j]->longitude;
+
+					// Call GeoDataManager storage procedure by object and local table parameters
+					$connection->executeUpdate("CALL GeoDataManager('$table', '$columnName', '$mergedId', '$realId' , '$addressArm', '$addressEng', '$latitude', '$longitude')");
 				}
 			}
 		}
