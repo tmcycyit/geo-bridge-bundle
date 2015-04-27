@@ -480,13 +480,13 @@ class YitGeo
 		// get address by id
 		$address = $this->em->getRepository('YitGeoBridgeBundle:Address')->findOneByAddressId($id);
 
-		if (isset($address) && $address != null) {
+		if ($address != null) {
 			// return address object if exist in YitGeoBridgeBundle:Address entity
 			return $address;
 		}
 		else {
 			// get address from Geo Main project
-			$addresses = $this->getContent(self::GEO_DOMAIN . 'api/addresses/' . $id . '');
+			$addresses = $this->getContent(self::GEO_DOMAIN . 'api/addresses/' . $id);
 
 			if (isset($addresses->title) && $addresses->title != null) {
 
