@@ -475,7 +475,7 @@ class YitGeo
 	 * @return Address
 	 * @throws \Exception
 	 */
-	public function getAddressByObjectId($id)
+	public function getAddressObjectById($id)
 	{
 		// get address by id
 		$address = $this->em->getRepository('YitGeoBridgeBundle:Address')->findOneByAddressId($id);

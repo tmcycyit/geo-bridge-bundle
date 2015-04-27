@@ -16,8 +16,8 @@ use Symfony\Component\DependencyInjection\Container;
 class MapsToGeoMigrationCommand extends ContainerAwareCommand
 {
 //    const GEO_DOMAIN = 'http://geo.yerevan.am/';
-    const GEO_DOMAIN = 'http://dev.geo.yerevan.am/';
-//	const GEO_DOMAIN = 'http://geo.loc/app_dev.php/';
+//	const GEO_DOMAIN = 'http://dev.geo.yerevan.am/';
+	const GEO_DOMAIN = 'http://geo.loc/app_dev.php/';
 
 	/**
 	 * This function is used to get content from $link
@@ -30,17 +30,13 @@ class MapsToGeoMigrationCommand extends ContainerAwareCommand
 	{
 		// reads a file into a string.
 		$content = @file_get_contents($link, false, $context);
-
 		if ($content) {
 			// content json decode
 			$content = json_decode($content);
 
-			if (isset($content->status) && $content->status != 404) {
+			if (isset($content->status) && $content->status == 204) {
 				$content = null;
 			}
-		}
-		else {
-			$content = null;
 		}
 
 		return $content;
@@ -109,7 +105,7 @@ class MapsToGeoMigrationCommand extends ContainerAwareCommand
 						";
 
 		// create storage procedures MySql
-		//  create new temp column (by adding 'geo_' prefix) for migration by given database, table and column names.
+		// create new temp column (by adding 'geo_' prefix) for migration by given database, table and column names.
 		// copy data from olt columns to new columns
 		// drop old columns
 		$geoDataDrop = "DROP PROCEDURE IF EXISTS `GeoDataMigration` ;
@@ -134,7 +130,7 @@ class MapsToGeoMigrationCommand extends ContainerAwareCommand
 										PREPARE stmt FROM @update ;
 										EXECUTE stmt;
                                     END;
-                                     BEGIN
+									BEGIN
 										SET @drop = CONCAT('ALTER TABLE ',tableName,' DROP ', columnName,';') ;
 										PREPARE stmt FROM @drop ;
 										EXECUTE stmt;
@@ -235,35 +231,44 @@ class MapsToGeoMigrationCommand extends ContainerAwareCommand
 			//restore database to its original state.
 			throw $e;
 		}
+
 		// get addresses id`s in project, get addresses string from main Geo project and insert or update in Yit:GeoBridgeBundle:Address
 		foreach ($idsResults as $idResult) {
 			//get id from id`s
 			foreach ($idResult as $ids) {
 
-				$opts = array('http' => array('method' => 'PUT', 'header' => "Content-Type: application/json",));
-				$hNumber = $this->produceUrlParameter($ids["geo_address"]);
-				$ladit = $this->produceUrlParameter($ids["latitude"]);
-				$lodit = $this->produceUrlParameter($ids["longitude"]);
-				$context = stream_context_create($opts);
+			$address = $this->produceUrlParameter($ids["geo_address"]);
 
-				$addresses = $this->getContent(self::GEO_DOMAIN . "api/put/address/" . $hNumber . "/" . $ladit . "/" . $lodit, $context);
-				$address = $ids['geo_address'];
-				$addressEng = null;
-				if (isset($addresses) && $addresses != null) {
+			// check address exist in Geo project
+		 	$existAddress = $this->getContent(self::GEO_DOMAIN . 'api/addresses/'.$address.'/search');
 
-					if (isset($address) && $address != null) {
-						$latitude = $ids["latitude"];
-						$longitude = $ids["longitude"];
+				if($existAddress == null)
+				{
+					$opts = array('http' =>
+						array('method' => 'PUT',
+							'header' => "Content-Type: application/json",));
+					$hNumber = $this->produceUrlParameter($ids["geo_address"]);
+					$ladit = $this->produceUrlParameter($ids["latitude"]);
+					$lodit = $this->produceUrlParameter($ids["longitude"]);
+					$context = stream_context_create($opts);
 
+					$addresses = $this->getContent(self::GEO_DOMAIN . "api/put/address/" . $hNumber . "/" . $ladit . "/" . $lodit, $context);
+					$address = $ids['geo_address'];
+					$addressEng = null;
+					if (isset($addresses) && $addresses != null) {
+
+						if (isset($address) && $address != null) {
+							$latitude = $ids["latitude"];
+							$longitude = $ids["longitude"];
+						}
+						else {
+							$latitude = null;
+							$longitude = null;
+						}
+
+						// insert address in YitGeoBridgeBundle:Address
+						$connection->executeUpdate("CALL GeoDataModified($addresses , '$address', '$addressEng', '$latitude', '$longitude')");
 					}
-					else {
-						$latitude = null;
-						$longitude = null;
-					}
-
-					// insert address in YitGeoBridgeBundle:Address
-					$connection->executeUpdate("CALL GeoDataModified($addresses , '$address', '$addressEng', '$latitude', '$longitude')");
-
 				}
 			}
 		}
