@@ -11,10 +11,10 @@
 
     <services>
 
-        <!--<service id="geo.event.listener" class="Yit\GeoBridgeBundle\Listener\GeoEventListener">-->
-            <!--<argument type="service" id="service_container" />-->
-            <!--<tag name="doctrine.event_listener" event="postLoad"/>-->
-        <!--</service>-->
+        <service id="geo.event.listener" class="Yit\GeoBridgeBundle\Listener\GeoEventListener">
+            <argument type="service" id="service_container" />
+            <tag name="doctrine.event_listener" event="postLoad"/>
+        </service>
 
         <service id="yit_geo" class="Yit\GeoBridgeBundle\Services\YitGeo">
             <argument type="service" id="service_container" />
@@ -23,6 +23,11 @@
 
         <service id="geo.form.type.geo_address" class="Yit\GeoBridgeBundle\Form\Type\GeoAddressType">
             <tag name="form.type" alias="geo_address" />
+        </service>
+
+        <service id="geo.form.type.geo_address_create" class="Yit\GeoBridgeBundle\Form\Type\AddressCreateType">
+            <argument type="service" id="doctrine.orm.entity_manager"/>
+            <tag name="form.type" alias="geo_address_create" />
         </service>
 
     </services>
