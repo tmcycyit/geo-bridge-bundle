@@ -28,9 +28,9 @@ class AddressCreateType extends AbstractType
 		$dateTime = $this->em->getRepository('YitGeoBridgeBundle:Address')->getLastUpdate();
 
         $builder->add('armName', 'text')
-				->add('engName', 'text')
-        		->add('latitude', null)
-        		->add('longitude', null)
+				->add('engName', 'text', array('required' => false))
+				->add('latitude', 'hidden', array('required' => false))
+				->add('longitude', 'hidden', array('required' => false))
 				->add('created', 'hidden', array('mapped' => false,'data'=> $dateTime ))
 				->add('updated', 'hidden', array('mapped' => false,'data'=> $dateTime ));
     }
