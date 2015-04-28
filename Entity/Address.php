@@ -236,5 +236,33 @@ class Address
 		return $this->engName;
 	}
 
+	///////////////////////////////////////////////////
+
+	///////////// Methods for position on map /////////////////////
+
+	/**
+	 * @return array
+	 * @JMS\Groups({"item", "list"})
+	 * @JMS\VirtualProperty
+	 */
+	public function getInmap()
+	{
+		$positions =  array('latitude'=>$this->latitude, 'longitude'=> $this->longitude);
+
+		return array('inmap' =>array('latitude' => $positions['latitude'],'longitude' => $positions['longitude']));
+	}
+
+	/**
+	 * @param $latlng
+	 * @return $this
+	 */
+	public function setInMap($latlng)
+	{
+		$this->setLatitude($latlng['latitude']);
+		$this->setLongitude($latlng['longitude']);
+
+		return $this;
+	}
+
 
 }
