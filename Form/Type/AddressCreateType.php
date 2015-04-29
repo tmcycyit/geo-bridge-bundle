@@ -25,33 +25,32 @@ class AddressCreateType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
 
-//		$lat = $this->configurationPool->getContainer()->getParameter('latitude');
-//		//get coordinate for longitude
-//		$lng = $this->configurationPool->getContainer()->getParameter('longitude');
 		$dateTime = $this->entityManager->getRepository('YitGeoBridgeBundle:Address')->getLastUpdate();
 //		var_dump($dateTime); exit;
 
-        $builder->add('armName', 'text')
+        $builder->add('addressId', 'integer')
+				->add('armName', 'text')
+				->add('search', 'button', array('label'=>'KOKO'))
 				->add('engName', 'text', array('required' => false))
 				->add('latitude', 'hidden', array('required' => false))
 				->add('longitude', 'hidden', array('required' => false))
-				->add('created', 'hidden', array('mapped' => false,'data'=> (new \DateTime($dateTime))))
-				->add('updated', 'hidden', array('mapped' => false,'data'=> (new \DateTime($dateTime))))
+				->add('created', 'hidden', array('mapped' => false,'data'=> $dateTime))
+				->add('updated', 'hidden', array('mapped' => false,'data'=> $dateTime))
+
 				->add('inmap', 'mapmarker', array('attr' =>
 						array('draggable' => true,
 							'limit' => 1,
-							'zoom' => 12) ));
+							'zoom' => 12) ))
+		;
     }
 
-//    /**
-//     * @param OptionsResolverInterface $resolver
-//     */
-//    public function setDefaultOptions(OptionsResolverInterface $resolver)
-//    {
-//        $resolver->setDefaults(array(
-//            'data_class' => 'Yit\GeoBridgeBundle\Form\Type\AddressCreateType'
-//        ));
-//    }
+
+	public function setDefaultOptions(OptionsResolverInterface $resolver)
+	{
+		$resolver->setDefaults(array(
+			'data_class' => 'Yit\GeoBridgeBundle\Entity\Address'
+		));
+	}
 
     /**
      * @return string

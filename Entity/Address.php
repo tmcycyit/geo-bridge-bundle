@@ -249,7 +249,7 @@ class Address
 	{
 		$positions =  array('latitude'=>$this->latitude, 'longitude'=> $this->longitude);
 
-		return array('inmap' =>array('latitude' => $positions['latitude'],'longitude' => $positions['longitude']));
+		return array('inmap' =>array('lat' => $positions['latitude'],'lng' => $positions['longitude']));
 	}
 
 	/**
@@ -258,8 +258,9 @@ class Address
 	 */
 	public function setInMap($latlng)
 	{
-		$this->setLatitude($latlng['latitude']);
-		$this->setLongitude($latlng['longitude']);
+//		var_dump($latlng); exit;
+		$this->setLatitude($latlng['lat']);
+		$this->setLongitude($latlng['lng']);
 
 		return $this;
 	}
