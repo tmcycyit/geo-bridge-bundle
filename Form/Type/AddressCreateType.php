@@ -22,28 +22,29 @@ class AddressCreateType extends AbstractType
 		$this->entityManager = $entityManager;
 	}
 
+	/**
+	 * @param FormBuilderInterface $builder
+	 * @param array $options
+	 */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
 
 		$dateTime = $this->entityManager->getRepository('YitGeoBridgeBundle:Address')->getLastUpdate();
-//		var_dump($dateTime); exit;
 
-        $builder->add('addressId', 'integer')
+        $builder->add('addressId', 'hidden')
 				->add('armName', 'text')
-				->add('search', 'button', array('label'=>'KOKO'))
-				->add('engName', 'text', array('required' => false))
+				->add('search', 'button', array('label'=>'Search'))
+				->add('engName', 'hidden', array('required' => false))
 				->add('latitude', 'hidden', array('required' => false))
 				->add('longitude', 'hidden', array('required' => false))
 				->add('created', 'hidden', array('mapped' => false,'data'=> $dateTime))
 				->add('updated', 'hidden', array('mapped' => false,'data'=> $dateTime))
-
 				->add('inmap', 'mapmarker', array('attr' =>
 						array('draggable' => true,
 							'limit' => 1,
 							'zoom' => 12) ))
 		;
     }
-
 
 	public function setDefaultOptions(OptionsResolverInterface $resolver)
 	{

@@ -9,17 +9,23 @@ use Symfony\Component\Process\Process;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Composer\Script\CommandEvent;
 
+/**
+ * This class used for create geo storage procedures after composer install or update
+ *
+ * Class ManageGeoStoredProcedureCommand
+ * @package Yit\GeoBridgeBundle\Command
+ */
 class ManageGeoStoredProcedureCommand {
 
 	/**
-	 * This function run sql storage procedures after composer install or update
+	 * This function run MySQL storage procedures after composer install or update
 	 * @param $event CommandEvent A instance
 	 */
 	public static function manageGeoStoredProcedure(CommandEvent $event)
 	{
 		$options = self::getOptions($event);
 		$appDir = $options['symfony-app-dir'];
-
+		// give command
 		static::executeCommand($event, $appDir, 'geo:manage:stored:procedure');
 	}
 

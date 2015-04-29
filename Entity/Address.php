@@ -56,7 +56,6 @@ class Address
 	/**
 	 * @var datetime $created
 	 *
-	 * @Gedmo\Timestampable(on="create")
 	 * @ORM\Column(type="datetime")
 	 */
 	private $created;
@@ -64,7 +63,6 @@ class Address
 	/**
 	 * @var datetime $updated
 	 *
-	 * @Gedmo\Timestampable(on="update")
 	 * @ORM\Column(type="datetime")
 	 */
 	private $updated;
@@ -236,11 +234,11 @@ class Address
 		return $this->engName;
 	}
 
-	///////////////////////////////////////////////////
-
 	///////////// Methods for position on map /////////////////////
 
 	/**
+	 * This function get latitude and longitude for show in YitMaps
+	 *
 	 * @return array
 	 * @JMS\Groups({"item", "list"})
 	 * @JMS\VirtualProperty
@@ -253,17 +251,17 @@ class Address
 	}
 
 	/**
+	 * This function set latitude and longitude from YitMaps
+	 *
 	 * @param $latlng
 	 * @return $this
 	 */
 	public function setInMap($latlng)
 	{
-//		var_dump($latlng); exit;
 		$this->setLatitude($latlng['lat']);
 		$this->setLongitude($latlng['lng']);
 
 		return $this;
 	}
-
 
 }
