@@ -19,8 +19,8 @@ use Yit\GeoBridgeBundle\Entity\Address;
 class YitGeo
 {
 //    const GEO_DOMAIN = 'http://geo.yerevan.am/';
-	const GEO_DOMAIN = 'http://dev.geo.yerevan.am/';
-//    const GEO_DOMAIN = 'http://geo.loc/app_dev.php/';
+//	const GEO_DOMAIN = 'http://dev.geo.yerevan.am/';
+    const GEO_DOMAIN = 'http://geo.loc/app_dev.php/';
 
 	/**
 	 * Container is a dependency injection container.
@@ -119,6 +119,52 @@ class YitGeo
 		}
 
 		return $address;
+	}
+
+	/**
+	 * This service return address object by addressId
+	 * If there are not found return exception
+	 *
+	 * @param $id
+	 * @return Address
+	 * @throws \Exception
+	 */
+	public function getAddressObjectById($id)
+	{
+		// get address by id
+		$address = $this->em->getRepository('YitGeoBridgeBundle:Address')->findOneByAddressId($id);
+
+		if ($address != null) {
+			// return address object if exist in YitGeoBridgeBundle:Address entity
+			return $address;
+		}
+		else {
+			// get address from Geo Main project
+			$addresses = $this->getContent(self::GEO_DOMAIN . 'api/addresses/' . $id);
+
+			if (isset($addresses->title) && $addresses->title != null) {
+
+				$dateTime = $this->em->getRepository('YitGeoBridgeBundle:Address')->getLastUpdate();
+
+				// create address in yit geo bridge
+				$address = new Address();
+				$address->setAddressId($id);
+				$address->setArmName($addresses->title);
+				$address->setEngName($addresses->eng_title);
+				$address->setLatitude($addresses->latitude);
+				$address->setLongitude($addresses->longitude);
+				$address->setCreated(new \DateTime($dateTime));
+				$address->setUpdated(new \DateTime($dateTime));
+				$this->em->persist($address);
+				$this->em->flush();
+
+				// return created address object
+				return $address;
+			}
+			else {
+				throw new \Exception('Address not found!');
+			}
+		}
 	}
 
 	/**
@@ -221,11 +267,39 @@ class YitGeo
 			$user = 'Geo_Bridge';
 		}
 
-		$opts = array('http' => array('method' => 'PUT', 'content' => http_build_query(array('project_name' => $this->container->getParameter('yit_geo_bridge.project_name'), 'author' => $user,))));
+		$opts = array('http' =>
+			array('method' => 'PUT',
+				   'content' => http_build_query(
+					   array('project_name' => $this->container->getParameter('yit_geo_bridge.project_name'),
+						     'author' => $user,))));
 		$addressString = $this->produceUrlParameter($addressString);
 		$context = stream_context_create($opts);
 
 		return $this->getContent(self::GEO_DOMAIN . "api/addresses/" . $addressString, $context);
+	}
+
+	/**
+	 * @param $addressString
+	 * @param $ladit
+	 * @param $lodit
+	 * @return mixed|null|string
+	 */
+	public function putAddressCreate($addressString, $ladit, $lodit)
+	{
+		$token = $this->container->get('security.context')->getToken();
+		if ($token) {
+
+			$user = $token->getUser()->getUserName();
+		}
+		else {
+			$user = 'Geo_Bridge';
+		}
+
+		$opts = array('http' => array('method' => 'PUT',
+			'content' => http_build_query(array('project_name' => $this->container->getParameter('yit_geo_bridge.project_name'), 'author' => $user,))));
+		$addressString = $this->produceUrlParameter($addressString);
+		$context = stream_context_create($opts);
+		return $this->getContent(self::GEO_DOMAIN . "api/put/address/" . $addressString . "/" . $ladit . "/" . $lodit, $context);
 	}
 
 	/**
@@ -467,49 +541,5 @@ class YitGeo
 		return $this->getContent(self::GEO_DOMAIN . 'api/streets/' . $search . '/search/' . $limit . '/' . $district);
 	}
 
-	/**
-	 * This service return address object by addressId
-	 * If there are not found return exception
-	 *
-	 * @param $id
-	 * @return Address
-	 * @throws \Exception
-	 */
-	public function getAddressObjectById($id)
-	{
-		// get address by id
-		$address = $this->em->getRepository('YitGeoBridgeBundle:Address')->findOneByAddressId($id);
 
-		if ($address != null) {
-			// return address object if exist in YitGeoBridgeBundle:Address entity
-			return $address;
-		}
-		else {
-			// get address from Geo Main project
-			$addresses = $this->getContent(self::GEO_DOMAIN . 'api/addresses/' . $id);
-
-			if (isset($addresses->title) && $addresses->title != null) {
-
-				$dateTime = $this->em->getRepository('YitGeoBridgeBundle:Address')->getLastUpdate();
-
-				// create address in yit geo bridge
-				$address = new Address();
-				$address->setAddressId($id);
-				$address->setArmName($addresses->title);
-				$address->setEngName($addresses->eng_title);
-				$address->setLatitude($addresses->latitude);
-				$address->setLongitude($addresses->longitude);
-				$address->setCreated(new \DateTime($dateTime));
-				$address->setUpdated(new \DateTime($dateTime));
-				$this->em->persist($address);
-				$this->em->flush();
-
-				// return created address object
-				return $address;
-			}
-			else {
-				throw new \Exception('Address not found!');
-			}
-		}
-	}
 }

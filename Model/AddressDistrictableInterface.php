@@ -24,7 +24,7 @@ interface AddressDistrictableInterface
      *
      * @return mixed
      */
-    public function getAddressId();
+    public function getAddress();
 
     /**
      * This function is used to inject district id

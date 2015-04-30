@@ -275,6 +275,8 @@ class GeoBridgeController extends Controller
 			{
 				// update address in YitGeoBridgeBundle
 				$address->setArmName($addressString);
+				$address->setLatitude(40.179496298328);
+				$address->setLongitude(44.512739181518555);
 				$address->setCreated(new \DateTime($dateTime));
 				$address->setUpdated(new \DateTime($dateTime));
 				$em->persist($address);
@@ -284,6 +286,8 @@ class GeoBridgeController extends Controller
 				$address = new Address();
 				$address->setAddressId($addressId);
 				$address->setArmName($addressString);
+				$address->setLatitude(40.179496298328);
+				$address->setLongitude(44.512739181518555);
 				$address->setCreated(new \DateTime($dateTime));
 				$address->setUpdated(new \DateTime($dateTime));
 				$em->persist($address);
@@ -294,4 +298,56 @@ class GeoBridgeController extends Controller
 
         return new Response($addressId);
     }
+
+	/**
+     * This function is used to put address on geo project
+     * If there are any error return null
+     *
+     * @Route("/putAddress/create/{addressString}/{ladit}/{lodit}", requirements={"addressString" = ".+"})
+     * @param $addressString
+     * @return Response
+     */
+    public function putAddressCreateAction($addressString, $ladit, $lodit)
+    {
+		// get doctrine connection
+		$em = $this->getDoctrine()->getManager();
+
+        $addressId = $this->get('yit_geo')->putAddressCreate($addressString, $ladit, $lodit);
+
+		if(isset($addressId) && isset($addressString))
+		{
+			// get address by address id
+			$address = $em->getRepository('YitGeoBridgeBundle:Address')->findOneByAddressId($addressId);
+			// get last synchronization updated date time
+			$dateTime = $em->getRepository('YitGeoBridgeBundle:Address')->getLastUpdate();
+			// if exist address update
+			if(isset($address) && $address != null)
+			{
+				// update address in YitGeoBridgeBundle
+				$address->setArmName($addressString);
+				$address->setLatitude($ladit);
+				$address->setLongitude($lodit);
+				$address->setCreated(new \DateTime($dateTime));
+				$address->setUpdated(new \DateTime($dateTime));
+				$em->persist($address);
+			}
+			else{
+				// insert address in YitGeoBridgeBundle
+				$address = new Address();
+				$address->setAddressId($addressId);
+				$address->setArmName($addressString);
+				$address->setLatitude($ladit);
+				$address->setLongitude($lodit);
+				$address->setCreated(new \DateTime($dateTime));
+				$address->setUpdated(new \DateTime($dateTime));
+				$em->persist($address);
+			}
+
+			$em->flush();
+		}
+
+        return new Response($addressId);
+    }
+
+
 }
