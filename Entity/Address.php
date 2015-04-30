@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping\UniqueConstraint;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 use JMS\Serializer\Annotation\Type;
+use JMS\Serializer\Annotation\VirtualProperty;
 
 /**
  * Address
@@ -240,8 +241,7 @@ class Address
 	 * This function get latitude and longitude for show in YitMaps
 	 *
 	 * @return array
-	 * @JMS\Groups({"item", "list"})
-	 * @JMS\VirtualProperty
+	 * @VirtualProperty
 	 */
 	public function getInmap()
 	{
