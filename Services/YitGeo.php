@@ -13,6 +13,7 @@ use FOS\RestBundle\Util\Codes;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\Validator\Constraints\Null;
 use Yit\GeoBridgeBundle\Entity\Address;
 
 
@@ -279,27 +280,32 @@ class YitGeo
 	}
 
 	/**
+	 * This function create address by used addressString, latitude and longitude
+	 *
 	 * @param $addressString
-	 * @param $ladit
-	 * @param $lodit
+	 * @param $latitude
+	 * @param $longitude
 	 * @return mixed|null|string
 	 */
-	public function putAddressCreate($addressString, $ladit, $lodit)
+	public function putAddressCreate($addressString, $latitude, $longitude)
 	{
 		$token = $this->container->get('security.context')->getToken();
-		if ($token) {
+		if ($token->getUser()!='anon.') {
 
 			$user = $token->getUser()->getUserName();
+
 		}
 		else {
 			$user = 'Geo_Bridge';
 		}
 
 		$opts = array('http' => array('method' => 'PUT',
-			'content' => http_build_query(array('project_name' => $this->container->getParameter('yit_geo_bridge.project_name'), 'author' => $user,))));
+			'content' => http_build_query(array(
+				'project_name' => $this->container->getParameter('yit_geo_bridge.project_name'),
+				'author' => $user,))));
 		$addressString = $this->produceUrlParameter($addressString);
 		$context = stream_context_create($opts);
-		return $this->getContent(self::GEO_DOMAIN . "api/put/address/" . $addressString . "/" . $ladit . "/" . $lodit, $context);
+		return $this->getContent(self::GEO_DOMAIN . "api/put/address/" . $addressString . "/" . $latitude . "/" . $longitude, $context);
 	}
 
 	/**

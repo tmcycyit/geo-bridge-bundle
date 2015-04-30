@@ -303,16 +303,16 @@ class GeoBridgeController extends Controller
      * This function is used to put address on geo project
      * If there are any error return null
      *
-     * @Route("/putAddress/create/{addressString}/{ladit}/{lodit}", requirements={"addressString" = ".+"})
+     * @Route("/create/putAddress/{addressString}/{latitude}/{longitude}", requirements={"addressString" = ".+"})
      * @param $addressString
      * @return Response
      */
-    public function putAddressCreateAction($addressString, $ladit, $lodit)
+    public function putAddressCreateAction($addressString, $latitude, $longitude)
     {
 		// get doctrine connection
 		$em = $this->getDoctrine()->getManager();
 
-        $addressId = $this->get('yit_geo')->putAddressCreate($addressString, $ladit, $lodit);
+        $addressId = $this->get('yit_geo')->putAddressCreate($addressString, $latitude, $longitude);
 
 		if(isset($addressId) && isset($addressString))
 		{
@@ -325,8 +325,8 @@ class GeoBridgeController extends Controller
 			{
 				// update address in YitGeoBridgeBundle
 				$address->setArmName($addressString);
-				$address->setLatitude($ladit);
-				$address->setLongitude($lodit);
+				$address->setLatitude($latitude);
+				$address->setLongitude($longitude);
 				$address->setCreated(new \DateTime($dateTime));
 				$address->setUpdated(new \DateTime($dateTime));
 				$em->persist($address);
@@ -336,8 +336,8 @@ class GeoBridgeController extends Controller
 				$address = new Address();
 				$address->setAddressId($addressId);
 				$address->setArmName($addressString);
-				$address->setLatitude($ladit);
-				$address->setLongitude($lodit);
+				$address->setLatitude($latitude);
+				$address->setLongitude($longitude);
 				$address->setCreated(new \DateTime($dateTime));
 				$address->setUpdated(new \DateTime($dateTime));
 				$em->persist($address);
