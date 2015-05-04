@@ -17,6 +17,10 @@ class AddressCreateType extends AbstractType
 	 * The EntityManager is the central access point to ORM functionality.
 	 */
 	protected $entityManager;
+
+	/**
+	 * @var Container
+	 */
 	protected $container;
 
 	/**
@@ -32,32 +36,34 @@ class AddressCreateType extends AbstractType
 	 * @param FormBuilderInterface $builder
 	 * @param array $options
 	 */
-    public function buildForm(FormBuilderInterface $builder, array $options)
-    {
-
-        $builder->add('addressId', 'geo_address');
-
-		$builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
-
-				$id = $event->getData()['addressId'];
-				$address = $this->container->get('yit_geo')->getAddressObjectById($id);
-				$event->setData($address);
-				 });
-	;
-    }
-
-	public function setDefaultOptions(OptionsResolverInterface $resolver)
+	public function buildForm(FormBuilderInterface $builder, array $options)
 	{
-		$resolver->setDefaults(array(
-			'data_class' => 'Yit\GeoBridgeBundle\Entity\Address'
-		));
+		$container = $this->container;
+
+		$builder->add('addressId', 'geo_address');
+
+		$builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) use ($container) {
+
+			$data = $event->getData();
+			$id = $data['addressId'];
+			$address = $container->get('yit_geo')->getAddressObjectById($id);
+			$event->setData($address);
+		});;
 	}
 
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return 'geo_address_create';
-    }
+	/**
+	 * @param OptionsResolverInterface $resolver
+	 */
+	public function setDefaultOptions(OptionsResolverInterface $resolver)
+	{
+		$resolver->setDefaults(array('data_class' => 'Yit\GeoBridgeBundle\Entity\Address'));
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getName()
+	{
+		return 'geo_address_create';
+	}
 }
