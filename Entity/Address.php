@@ -57,14 +57,14 @@ class Address
 	/**
 	 * @var datetime $created
 	 *
-	 * @ORM\Column(type="datetime")
+	 * @ORM\Column(type="datetime", nullable=true)
 	 */
 	private $created;
 
 	/**
 	 * @var datetime $updated
 	 *
-	 * @ORM\Column(type="datetime")
+	 * @ORM\Column(type="datetime", nullable=true)
 	 */
 	private $updated;
 

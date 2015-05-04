@@ -3,9 +3,13 @@
 namespace Yit\GeoBridgeBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Yit\GeoBridgeBundle\Services\YitGeo;
 
 class AddressCreateType extends AbstractType
 {
@@ -13,13 +17,15 @@ class AddressCreateType extends AbstractType
 	 * The EntityManager is the central access point to ORM functionality.
 	 */
 	protected $entityManager;
+	protected $container;
 
 	/**
 	 * @param EntityManager $entityManager
 	 */
-	public function __construct(EntityManager $entityManager = null)
+	public function __construct(EntityManager $entityManager = null, Container $container = null)
 	{
 		$this->entityManager = $entityManager;
+		$this->container = $container;
 	}
 
 	/**
@@ -29,21 +35,15 @@ class AddressCreateType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
 
-		$dateTime = $this->entityManager->getRepository('YitGeoBridgeBundle:Address')->getLastUpdate();
+        $builder->add('addressId', 'geo_address');
 
-        $builder->add('addressId', 'hidden')
-				->add('armName', 'text')
-				->add('search', 'button', array('label'=>'Search'))
-				->add('engName', 'hidden', array('required' => false))
-				->add('latitude', 'hidden', array('required' => false))
-				->add('longitude', 'hidden', array('required' => false))
-				->add('created', 'hidden', array('mapped' => false,'data'=> $dateTime))
-				->add('updated', 'hidden', array('mapped' => false,'data'=> $dateTime))
-				->add('inmap', 'mapmarker', array('attr' =>
-						array('draggable' => true,
-							'limit' => 1,
-							'zoom' => 12) ))
-		;
+		$builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
+
+				$id = $event->getData()['addressId'];
+				$address = $this->container->get('yit_geo')->getAddressObjectById($id);
+				$event->setData($address);
+				 });
+	;
     }
 
 	public function setDefaultOptions(OptionsResolverInterface $resolver)
