@@ -38,17 +38,21 @@ class AddressCreateType extends AbstractType
 	 */
 	public function buildForm(FormBuilderInterface $builder, array $options)
 	{
-		$container = $this->container;
-
 		$builder->add('addressId', 'geo_address');
 
-		$builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) use ($container) {
-
+		// get container for FormEvents
+		$container = $this->container;
+		$builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) use ($container)
+			{
+			// get form data
 			$data = $event->getData();
 			$id = $data['addressId'];
+			// call yit geo service return address object
 			$address = $container->get('yit_geo')->getAddressObjectById($id);
+			// set address object in form
 			$event->setData($address);
-		});;
+			}
+		);
 	}
 
 	/**

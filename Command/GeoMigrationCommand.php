@@ -55,10 +55,11 @@ class GeoMigrationCommand extends ContainerAwareCommand
             ->setDescription('GeoBridgeBundle geo address migration data manager ');
     }
 
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     */
+	/**
+	 * @param InputInterface $input
+	 * @param OutputInterface $output
+	 * @throws \Exception
+	 */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         // Begin run command
