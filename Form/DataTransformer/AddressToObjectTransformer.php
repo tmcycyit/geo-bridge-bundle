@@ -45,7 +45,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 			 return "$address not found";
 		 }
 
-		 return $address->getArmName();
+		 return $address->getAddressId();
 	 }
 
 	 /**

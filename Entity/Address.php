@@ -94,7 +94,7 @@ class Address
      *
      * @return integer 
      */
-    public function getAddressId()
+		public function getAddressId()
     {
         return $this->addressId;
     }
