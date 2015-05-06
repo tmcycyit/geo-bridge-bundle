@@ -49,7 +49,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 	 }
 
 	 /**
-	  * Transforms a string (number) to an object (issue).
+	  * Transforms a string (address id) to an object (address).
 	  *
 	  * @param mixed $addressId
 	  *

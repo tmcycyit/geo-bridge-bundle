@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Validator\Constraints\Null;
 use Yit\GeoBridgeBundle\Entity\Address;
+use Yit\GeoBridgeBundle\Form\DataTransformer\AddressToObjectTransformer;
 
 
 class YitGeo
@@ -166,6 +167,19 @@ class YitGeo
 				throw new \Exception('Address not found!');
 			}
 		}
+	}
+
+	/**
+	 * This function call AddressToObjectTransformer use container and return Address object
+	 *
+	 * @param $container
+	 * @return AddressToObjectTransformer
+	 */
+	public function addressDataTransformer($container)
+	{
+		$transformer = new AddressToObjectTransformer($container);
+		
+		return $transformer;
 	}
 
 	/**
