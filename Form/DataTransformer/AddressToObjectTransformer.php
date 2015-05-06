@@ -18,9 +18,14 @@ use Doctrine\Common\Persistence\ObjectManager;
 
  class AddressToObjectTransformer implements DataTransformerInterface
 {
+	 /**
+	  * @var Container
+	  */
 	 private $container;
 
 	 /**
+	  * get Symfony Dependency Injection Container
+	  *
 	  * @param Container $container
 	  */
 	public function __construct(Container $container = null)
@@ -29,18 +34,16 @@ use Doctrine\Common\Persistence\ObjectManager;
 	}
 
 	 /**
-	  * @param mixed $addressId
+	  *
+	  * this function use end show data from field
+	  * @param mixed $address
 	  * @return string
 	  */
-	 public function transform($addressId)
+	 public function transform($address)
 	 {
-		 $container = $this->container;
-
-		 if (null === $addressId) {
-			 return "addressId not found";
+		 if (null === $address) {
+			 return "$address not found";
 		 }
-
-		 $address = $container->get('yit_geo')->getAddressObjectById($addressId);
 
 		 return $address->getArmName();
 	 }
