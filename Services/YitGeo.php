@@ -96,9 +96,7 @@ class YitGeo
 	/**
 	 * This function return address object by given id
 	 * If there are not any address with such id return null
-	 * @deprecated this function is deprecated and will be removed
-	 *             in version 1.1.0 of GeoBridgeBundle. Please use the
-	 *             {getAddressByObjectId} instead.
+	 *
 	 * @param $id
 	 * @return object
 	 */
@@ -146,6 +144,7 @@ class YitGeo
 
 			if (isset($addresses->title) && $addresses->title != null) {
 
+				// get last updated data time in YitGeoBridgeBundle Address entity
 				$dateTime = $this->em->getRepository('YitGeoBridgeBundle:Address')->getLastUpdate();
 
 				// create address in yit geo bridge
@@ -178,7 +177,7 @@ class YitGeo
 	public function addressDataTransformer($container)
 	{
 		$transformer = new AddressToObjectTransformer($container);
-		
+
 		return $transformer;
 	}
 
