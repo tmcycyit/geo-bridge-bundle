@@ -169,19 +169,6 @@ class YitGeo
 	}
 
 	/**
-	 * This function call AddressToObjectTransformer use container and return Address object
-	 *
-	 * @param $container
-	 * @return AddressToObjectTransformer
-	 */
-	public function addressDataTransformer($container)
-	{
-		$transformer = new AddressToObjectTransformer($container);
-
-		return $transformer;
-	}
-
-	/**
 	 * This function is used get address synonym ids
 	 *
 	 * @param $addressId
