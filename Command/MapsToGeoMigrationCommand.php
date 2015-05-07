@@ -15,10 +15,6 @@ use Symfony\Component\DependencyInjection\Container;
 
 class MapsToGeoMigrationCommand extends ContainerAwareCommand
 {
-//    const GEO_DOMAIN = 'http://geo.yerevan.am/';
-	const GEO_DOMAIN = 'http://dev.geo.yerevan.am/';
-//	const GEO_DOMAIN = 'http://geo.loc/app_dev.php/';
-
 	/**
 	 * This function is used to get content from $link
 	 *
@@ -239,8 +235,10 @@ class MapsToGeoMigrationCommand extends ContainerAwareCommand
 
 			$address = $this->produceUrlParameter($ids["geo_address"]);
 
+			// get Geo main project domain from this project config if config is empty default set http://geo.yerevan.am/
+			$geoDomain = $this->getContainer()->getParameter('yit_geo_bridge.project_domain');
 			// check address exist in Geo project
-		 	$existAddress = $this->getContent(self::GEO_DOMAIN . 'api/addresses/'.$address.'/search');
+		 	$existAddress = $this->getContent($geoDomain . 'api/addresses/'.$address.'/search');
 
 				if($existAddress == null)
 				{
@@ -252,7 +250,7 @@ class MapsToGeoMigrationCommand extends ContainerAwareCommand
 					$lodit = $this->produceUrlParameter($ids["longitude"]);
 					$context = stream_context_create($opts);
 
-					$addresses = $this->getContent(self::GEO_DOMAIN . "api/put/address/" . $hNumber . "/" . $ladit . "/" . $lodit, $context);
+					$addresses = $this->getContent($geoDomain . "api/put/address/" . $hNumber . "/" . $ladit . "/" . $lodit, $context);
 					$address = $ids['geo_address'];
 					$addressEng = null;
 					if (isset($addresses) && $addresses != null) {

@@ -17,7 +17,7 @@ namespace Yit\GeoBridgeBundle\Model;
  *
  * @package Yit\GeoBridgeBundle\Model
  */
-interface AddressDistrictableInterfaceToShow extends AddressDistrictableInterface
+interface AddressDistrictAwareInterface extends AddressDistrictableInterface
 {
 
 }

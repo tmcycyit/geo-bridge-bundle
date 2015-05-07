@@ -14,10 +14,6 @@ use Symfony\Component\DependencyInjection\Container;
 
 class GeoDataManagerCommand extends ContainerAwareCommand
 {
-//	const GEO_DOMAIN = 'http://geo.yerevan.am/';
-	const GEO_DOMAIN = 'http://dev.geo.yerevan.am/';
-//	const GEO_DOMAIN = 'http://geo.loc/app_dev.php/';
-
 	/**
 	 * This function is used to get content from $link
 	 *
@@ -75,8 +71,10 @@ class GeoDataManagerCommand extends ContainerAwareCommand
 		// get Last Update Address
 		$dateTime = str_replace(" ", "%20", $em->getRepository('YitGeoBridgeBundle:Address')->getLastUpdate());
 
+		// get Geo main project domain from this project config if config is empty default set http://geo.yerevan.am/
+		$geoDomain = $this->getContainer()->getParameter('yit_geo_bridge.project_domain');
 		// get updates in Geo
-		$modified = $this->getContent(self::GEO_DOMAIN . 'api/addresses/' . $dateTime . '/modified');
+		$modified = $this->getContent($geoDomain . 'api/addresses/' . $dateTime . '/modified');
 
 		// start MySQL Transaction
 	$connection->beginTransaction();

@@ -10,9 +10,9 @@ namespace Yit\GeoBridgeBundle\Listener;
 
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Yit\GeoBridgeBundle\Model\AddressDistrictableInterface;
-use Yit\GeoBridgeBundle\Model\AddressDistrictableInterfaceToShow;
+use Yit\GeoBridgeBundle\Model\AddressDistrictAwareInterface;
 use Yit\GeoBridgeBundle\Model\AddressStreetableInterface;
-use Yit\GeoBridgeBundle\Model\AddressStreetableInterfaceToChange;
+use Yit\GeoBridgeBundle\Model\AddressStreetAwareInterface;
 use Yit\GeoBridgeBundle\Model\DistrictableInterface;
 use Yit\GeoBridgeBundle\Model\StreetableInterface;
 use Symfony\Component\DependencyInjection\Container;
@@ -50,7 +50,7 @@ class GeoEventListener
                 {
                     //If $entity has not district_id or if it has but it implements AddressDistrictableInterfaceToShow
                     //interface add district_id to it
-                    if (!$entity->getDistrictId() || $entity instanceof AddressDistrictableInterfaceToShow) {
+                    if (!$entity->getDistrictId() || $entity instanceof AddressDistrictAwareInterface) {
                         $entity->setDistrictId($address->street_district->district->id);
                     }
 
@@ -95,7 +95,7 @@ class GeoEventListener
                 {
                     //If $entity has not street_id or if it has but it implements AddressStreetableInterfaceToShow
                     //interface add street_id to it
-                    if (!$entity->getStreetId() || $entity instanceof AddressStreetableInterfaceToChange) {
+                    if (!$entity->getStreetId() || $entity instanceof AddressStreetAwareInterface) {
                         $entity->setStreetId($address->street_district->street->id);
                         $isNull = true;
                     }

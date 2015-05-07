@@ -37,5 +37,11 @@ class YitGeoBridgeExtension extends Extension
         else {
             $container->setParameter($this->getAlias() . '.project_name', 'geo_bridge');
         }
+		if (isset($config) && isset($config['project_domain'])) {
+            $container->setParameter($this->getAlias() . '.project_domain', $config['project_domain']);
+        }
+        else {
+            $container->setParameter($this->getAlias() . '.project_domain', 'http://geo.yerevan.am/');
+        }
     }
 }

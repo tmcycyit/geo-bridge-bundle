@@ -17,6 +17,6 @@ namespace Yit\GeoBridgeBundle\Model;
  *
  * @package Yit\GeoBridgeBundle\Model
  */
-interface AddressStreetableInterfaceToChange extends AddressStreetableInterface
+interface AddressStreetAwareInterface extends AddressStreetableInterface
 {
 }

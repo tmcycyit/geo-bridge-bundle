@@ -20,9 +20,6 @@ use Yit\GeoBridgeBundle\Form\DataTransformer\AddressToObjectTransformer;
 
 class YitGeo
 {
-//    const GEO_DOMAIN = 'http://geo.yerevan.am/';
-	const GEO_DOMAIN = 'http://dev.geo.yerevan.am/';
-//    const GEO_DOMAIN = 'http://geo.loc/app_dev.php/';
 
 	/**
 	 * Container is a dependency injection container.
@@ -40,6 +37,14 @@ class YitGeo
 	protected $entityManager;
 
 	/**
+	 * This function get geo main project domain from config
+	 * If config not use default set http://geo.yerevan.am/
+	 *
+	 * @return mixed
+	 */
+	protected $geoDomain;
+
+	/**
 	 * @param Container $container
 	 * @param EntityManager $entityManager
 	 */
@@ -48,8 +53,8 @@ class YitGeo
 		$this->container = $container;
 		$this->experience = $this->container->getParameter('yit_geo_bridge.experience');
 		$this->em = $entityManager;
+		$this->geoDomain = $this->container->getParameter('yit_geo_bridge.project_domain');
 	}
-
 
 	/**
 	 * This function is used to get content from $link
@@ -111,7 +116,7 @@ class YitGeo
 				$address = $address->getAddress();
 			}
 			else {
-				$address = $this->getContent(self::GEO_DOMAIN . 'api/addresses/' . $id);
+				$address = $this->getContent($this->geoDomain . 'api/addresses/' . $id);
 				//Store address in cache 24 hours
 			}
 			apc_add('address_' . $id, $address, $this->experience);
@@ -133,14 +138,14 @@ class YitGeo
 	{
 		// get address by id
 		$address = $this->em->getRepository('YitGeoBridgeBundle:Address')->findOneByAddressId($id);
-
+var_dump($this->geoDomain); exit;
 		if ($address != null) {
 			// return address object if exist in YitGeoBridgeBundle:Address entity
 			return $address;
 		}
 		else {
 			// get address from Geo Main project
-			$addresses = $this->getContent(self::GEO_DOMAIN . 'api/addresses/' . $id);
+			$addresses = $this->getContent($this->geoDomain . 'api/addresses/' . $id);
 
 			if (isset($addresses->title) && $addresses->title != null) {
 
@@ -176,7 +181,7 @@ class YitGeo
 	 */
 	public function getSynonymIds($addressId)
 	{
-		return $this->getContent(self::GEO_DOMAIN . 'api/addresses/' . $addressId . '/synonyms');
+		return $this->getContent($this->geoDomain . 'api/addresses/' . $addressId . '/synonyms');
 	}
 
 	/**
@@ -191,7 +196,7 @@ class YitGeo
 	public function searchAddress($search, $limit = 0, $districtId = 0)
 	{
 		$search = $this->produceUrlParameter($search);
-		return $this->getContent(self::GEO_DOMAIN . 'api/addresses/' . $search . '/search/' . $limit . '/' . $districtId);
+		return $this->getContent($this->geoDomain . 'api/addresses/' . $search . '/search/' . $limit . '/' . $districtId);
 	}
 
 	/**
@@ -204,7 +209,7 @@ class YitGeo
 	public function searchModifiedAddress($dateTime)
 	{
 		$dateTime = $this->produceUrlParameter($dateTime);
-		return $this->getContent(self::GEO_DOMAIN . 'api/addresses/' . $dateTime . '/modified');
+		return $this->getContent($this->geoDomain . 'api/addresses/' . $dateTime . '/modified');
 	}
 
 	/**
@@ -219,7 +224,7 @@ class YitGeo
 	public function searchRealAddress($search, $limit = 0, $districtId = 0)
 	{
 		$search = $this->produceUrlParameter($search);
-		return $this->getContent(self::GEO_DOMAIN . 'api/real/addresses/' . $search . '/search/' . $limit . '/' . $districtId);
+		return $this->getContent($this->geoDomain . 'api/real/addresses/' . $search . '/search/' . $limit . '/' . $districtId);
 	}
 
 	/**
@@ -233,7 +238,7 @@ class YitGeo
 	public function searchFlexibleAddress($search, $limit = 0)
 	{
 		$search = $this->produceUrlParameter($search);
-		return $this->getContent(self::GEO_DOMAIN . 'api/flexible/addresses/' . $search . '/search/' . $limit);
+		return $this->getContent($this->geoDomain . 'api/flexible/addresses/' . $search . '/search/' . $limit);
 	}
 
 	/**
@@ -248,7 +253,7 @@ class YitGeo
 
 		$context = stream_context_create($opts);
 
-		return $this->getContent(self::GEO_DOMAIN . "api/addresses/multiples", $context);
+		return $this->getContent($this->geoDomain . "api/addresses/multiples", $context);
 	}
 
 	/**
@@ -276,7 +281,7 @@ class YitGeo
 		$addressString = $this->produceUrlParameter($addressString);
 		$context = stream_context_create($opts);
 
-		return $this->getContent(self::GEO_DOMAIN . "api/addresses/" . $addressString, $context);
+		return $this->getContent($this->geoDomain . "api/addresses/" . $addressString, $context);
 	}
 
 	/**
@@ -305,7 +310,7 @@ class YitGeo
 				'author' => $user,))));
 		$addressString = $this->produceUrlParameter($addressString);
 		$context = stream_context_create($opts);
-		return $this->getContent(self::GEO_DOMAIN . "api/put/address/" . $addressString . "/" . $latitude . "/" . $longitude, $context);
+		return $this->getContent($this->geoDomain . "api/put/address/" . $addressString . "/" . $latitude . "/" . $longitude, $context);
 	}
 
 	/**
@@ -327,7 +332,7 @@ class YitGeo
 		$street = $this->produceUrlParameter($street);
 		$context = stream_context_create($opts);
 
-		return $this->getContent(self::GEO_DOMAIN . "api/put/addresses/" . $street . "/" . $streetType . "/" . $district . "/" . $hNumber, $context);
+		return $this->getContent($this->geoDomain . "api/put/addresses/" . $street . "/" . $streetType . "/" . $district . "/" . $hNumber, $context);
 	}
 
 	/**
@@ -345,7 +350,7 @@ class YitGeo
 		$hNumber = $hNumber? $hNumber : 0;
 		$street = $this->produceUrlParameter($street);
 		$hNumber = $this->produceUrlParameter($hNumber);
-		return $this->getContent(self::GEO_DOMAIN . 'api/param/addresses/' . $street . '/' . $type . '/' . $hNumber);
+		return $this->getContent($this->geoDomain . 'api/param/addresses/' . $street . '/' . $type . '/' . $hNumber);
 	}
 
 	//******************************************
@@ -364,7 +369,7 @@ class YitGeo
 		$district = apc_fetch('district_' . $id);
 
 		if ($district === false) {
-			$district = $this->getContent(self::GEO_DOMAIN . 'api/districts/' . $id);
+			$district = $this->getContent($this->geoDomain . 'api/districts/' . $id);
 			//Store district in cache 24 hours
 			apc_add('district_' . $id, $district, $this->experience);
 		}
@@ -384,7 +389,7 @@ class YitGeo
 		$districts = apc_fetch('districts');
 
 		if ($districts === false) {
-			$districts = $this->getContent(self::GEO_DOMAIN . 'api/districts');
+			$districts = $this->getContent($this->geoDomain . 'api/districts');
 			//Store districts in cache 24 hours
 			apc_add('districts', $districts, $this->experience);
 		}
@@ -431,7 +436,7 @@ class YitGeo
 		$streets = apc_fetch('district_streets');
 
 		if ($streets === false) {
-			$streets = $this->getContent(self::GEO_DOMAIN . 'api/districts/' . $districtID . '/streets');
+			$streets = $this->getContent($this->geoDomain . 'api/districts/' . $districtID . '/streets');
 
 			//Store streets in cache 24 hours
 			apc_add('district_streets', $streets, $this->experience);
@@ -451,7 +456,7 @@ class YitGeo
 	public function searchDistrict($search)
 	{
 		$search = $this->produceUrlParameter($search);
-		return $this->getContent(self::GEO_DOMAIN . 'api/districts/' . $search . '/search');
+		return $this->getContent($this->geoDomain . 'api/districts/' . $search . '/search');
 	}
 
 	//******************************************
@@ -470,7 +475,7 @@ class YitGeo
 		$street = apc_fetch('street_' . $id);
 
 		if ($street === false) {
-			$street = $this->getContent(self::GEO_DOMAIN . 'api/streets/' . $id);
+			$street = $this->getContent($this->geoDomain . 'api/streets/' . $id);
 
 			//Store district in cache 24 hours
 			apc_add('street_' . $id, $street, $this->experience);
@@ -492,7 +497,7 @@ class YitGeo
 		$street = apc_fetch('address_street_' . $id);
 
 		if ($street === false) {
-			$street = $this->getContent(self::GEO_DOMAIN . 'api/addresses/' . $id . '/street');
+			$street = $this->getContent($this->geoDomain . 'api/addresses/' . $id . '/street');
 
 			//Store district in cache 24 hours
 			apc_add('address_street_' . $id, $street, $this->experience);
@@ -513,7 +518,7 @@ class YitGeo
 	public function searchStreet($search, $limit = 0)
 	{
 		$search = $this->produceUrlParameter($search);
-		return $this->getContent(self::GEO_DOMAIN . 'api/streets/' . $search . '/search/' . $limit);
+		return $this->getContent($this->geoDomain . 'api/streets/' . $search . '/search/' . $limit);
 	}
 
 	/**
@@ -527,7 +532,7 @@ class YitGeo
 	public function searchStreetFlexible($search, $limit = 0)
 	{
 		$search = $this->produceUrlParameter($search);
-		return $this->getContent(self::GEO_DOMAIN . 'api/flexible/streets/' . $search . '/search/' . $limit);
+		return $this->getContent($this->geoDomain . 'api/flexible/streets/' . $search . '/search/' . $limit);
 	}
 
 
@@ -544,7 +549,7 @@ class YitGeo
 	{
 		$limit = ($limit)? $limit : 10;
 
-		return $this->getContent(self::GEO_DOMAIN . 'api/streets/' . $search . '/search/' . $limit . '/' . $district);
+		return $this->getContent($this->geoDomain . 'api/streets/' . $search . '/search/' . $limit . '/' . $district);
 	}
 
 

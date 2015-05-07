@@ -235,7 +235,10 @@ class GeoMigrationCommand extends ContainerAwareCommand
 						$addresses = null;
 						// checking address title
 						if(is_null($address)){
-							$addresses = $this->getContent(self::GEO_DOMAIN . 'api/addresses/' . $id . '');
+							// get Geo main project domain from this project config if config is empty default set http://geo.yerevan.am/
+							$geoDomain = $this->getContainer()->getParameter('yit_geo_bridge.project_domain');
+
+							$addresses = $this->getContent($geoDomain . 'api/addresses/' . $id . '');
 
 							if (isset($addresses->title) && $addresses->title != null) {
 								$addressArm = $addresses->title;
