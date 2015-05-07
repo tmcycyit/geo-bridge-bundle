@@ -23,7 +23,7 @@
             <argument type="service" id="doctrine.orm.entity_manager"/>
         </service>
 
-        <!-- YitGeo service config -->
+        <!-- Address Data Transformer service config -->
         <service id="yit_geo_address_trasnformer" class="Yit\GeoBridgeBundle\Form\DataTransformer\AddressToObjectTransformer">
             <argument type="service" id="service_container" />
         </service>
