@@ -5,6 +5,7 @@ namespace Yit\GeoBridgeBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\ORM\Mapping\UniqueConstraint;
+use JMS\Serializer\Annotation\Groups;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 use JMS\Serializer\Annotation\Type;
@@ -31,6 +32,7 @@ class Address
 	 *
 	 * @Assert\Regex(pattern="/^(([Ա-ՖՈՉՊՋՍՎՏՐՑՒՓՔՕա-ֆևփւրցքօ\֊\.․, \/\s0-9]{0,})){1,1}$/i", message="Street Arm name type is invalid")
 	 * @ORM\Column(name="arm_name", type="string", length=255, nullable=true)
+	 * @Groups({"place", "placeSide", "company", "model"})
 	 */
 	private $armName;
 

@@ -75,6 +75,7 @@ class GeoDataManagerCommand extends ContainerAwareCommand
 		$geoDomain = $this->getContainer()->getParameter('yit_geo_bridge.project_domain');
 		// get updates in Geo
 		$modified = $this->getContent($geoDomain . 'api/addresses/' . $dateTime . '/modified');
+//var_dump(count($modified->merged)); exit;
 
 		// start MySQL Transaction
 	$connection->beginTransaction();
@@ -116,7 +117,6 @@ class GeoDataManagerCommand extends ContainerAwareCommand
 								AND REFERENCED_TABLE_NAME = :referenced_table_name
 								AND REFERENCED_COLUMN_NAME IS NOT NULL
 								";
-
 			$sth = $connection->prepare("$relations");
 
 			// set parameters in query
@@ -124,8 +124,8 @@ class GeoDataManagerCommand extends ContainerAwareCommand
 			$params['referenced_table_name'] = 'yit_geo_address';
 			$sth->execute($params);
 			$result = $sth->fetchAll();
-			for ($i = 0; $i < count($result); $i++) {
 
+			for ($i = 0; $i < count($result); $i++) {
 				//get related table and column name
 				$table = $result[$i]['TABLE_NAME'];
 				$columnName = $result[$i]['COLUMN_NAME'];
@@ -141,6 +141,12 @@ class GeoDataManagerCommand extends ContainerAwareCommand
 
 					// Call GeoDataManager storage procedure by object and local table parameters
 					$connection->executeUpdate("CALL GeoDataManager('$table', '$columnName', '$mergedId', '$realId' , '$addressArm', '$addressEng', '$latitude', '$longitude')");
+
+					if($j === count($result))
+					{
+						// Call GeoDataDrop storage procedure by object $mergedId
+						$connection->executeUpdate("CALL GeoDataDrop('$mergedId')");
+					}
 				}
 			}
 		}

@@ -92,11 +92,21 @@ class GeoStoredProcedureCommand extends ContainerAwareCommand
                      	WHERE ', column_name,  '= ',merged_id,'') ;
 						PREPARE stmt FROM @update ;
 						EXECUTE stmt;
-						DELETE FROM yit_geo_address WHERE yit_geo_address.id = merged_id;
-							COMMIT ;
+						COMMIT ;
 						END";
 
 		$em->executeUpdate($geoDataManager, $margeParams);
+
+		// Drop Geo Data Drop storage procedure
+		$geoDataDrop = "DROP PROCEDURE IF EXISTS `GeoDataDrop` ;
+						CREATE PROCEDURE  `GeoDataDrop` (	 IN  `merged_id` INT( 11 ))
+					    COMMENT 'Geo data drop stored procedure'
+					    NOT DETERMINISTIC MODIFIES SQL DATA SQL SECURITY DEFINER
+						BEGIN
+						DELETE FROM yit_geo_address WHERE yit_geo_address.id = merged_id;
+						END";
+
+		$em->executeUpdate($geoDataDrop, $margeParams);
 
 		$output->writeln("<info>GeoBridgeBundle storage procedures successfully created or updated!</info>");
 	}
