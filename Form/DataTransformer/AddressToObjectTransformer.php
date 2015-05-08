@@ -59,7 +59,8 @@ use Doctrine\Common\Persistence\ObjectManager;
 	 {
 		 $container = $this->container;
 
-		 if (!$addressId) {
+		 //TODO need change address Id == 0
+		 if (is_null($addressId) || !$addressId || $addressId == 0) {
 			 return null;
 		 }
 
