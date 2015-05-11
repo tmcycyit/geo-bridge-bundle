@@ -17,14 +17,21 @@ example
 Address entity have fields :
             $addressId, $armName, $engName, $latitude, $longitude, $created, $updated
 
-#### Remove AddressableInterface
-#### Remove MultiAddressableInterface
-#### Remove AddressChangeableInterface
-#### Rename AddressDistrictableInterfaceToShow to AddressDistrictAwareInterface
-#### Rename AddressStreetableInterfaceToChange to AddressStreetAwareInterface
-#### Add service yit_geo_address_trasnformer
-#### Add in yit_gro service function getAddressObjectById($id), this service return address object by address Id
-#### If use 'geo_address' form type
+Remove AddressableInterface
+ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+Remove MultiAddressableInterface
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+Remove AddressChangeableInterface
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+Rename AddressDistrictableInterfaceToShow to AddressDistrictAwareInterface
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+Rename AddressStreetableInterfaceToChange to AddressStreetAwareInterface
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+Add service yit_geo_address_trasnformer
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+Add in yit_gro service function getAddressObjectById($id), this service return address object by address Id
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+If use 'geo_address' form type
 
 // in form type
 //namespace YourProject\YourBundle\Form\Type\YourFormType;
