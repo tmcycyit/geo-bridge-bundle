@@ -1,6 +1,8 @@
-# Upgrade to 1.1.0
+Upgrade to 1.1.0
+===================
 
-## Add entity Address
+ Add entity Address
+ _ _ _ _ _ _ _ _ _ _
 before 1.1.0 version if use address need create relation ManyToOne to Address entity
 example
 
@@ -15,14 +17,14 @@ example
 Address entity have fields :
             $addressId, $armName, $engName, $latitude, $longitude, $created, $updated
 
-## Remove AddressableInterface
-## Remove MultiAddressableInterface
-## Remove AddressChangeableInterface
-## Rename AddressDistrictableInterfaceToShow to AddressDistrictAwareInterface
-## Rename AddressStreetableInterfaceToChange to AddressStreetAwareInterface
-## Add service yit_geo_address_trasnformer
-## Add in yit_gro service function getAddressObjectById($id), this service return address object by address Id
-## If use 'geo_address' form type
+#### Remove AddressableInterface
+#### Remove MultiAddressableInterface
+#### Remove AddressChangeableInterface
+#### Rename AddressDistrictableInterfaceToShow to AddressDistrictAwareInterface
+#### Rename AddressStreetableInterfaceToChange to AddressStreetAwareInterface
+#### Add service yit_geo_address_trasnformer
+#### Add in yit_gro service function getAddressObjectById($id), this service return address object by address Id
+#### If use 'geo_address' form type
 
 // in form type
 //namespace YourProject\YourBundle\Form\Type\YourFormType;
@@ -74,7 +76,7 @@ change in composer.json
 
 
 ## Enter configure config.yml
-By default this config use "http://geo.yerevan.am/" . You can use dev or local domain
+##### By default this config use "http://geo.yerevan.am/" . You can use dev or local domain
             example
                 yit_geo_bridge:
                     project_domain: http://dev.geo.yerevan.am/
