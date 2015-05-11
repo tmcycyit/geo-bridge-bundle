@@ -17,41 +17,43 @@ example
 Address entity have fields :
             $addressId, $armName, $engName, $latitude, $longitude, $created, $updated
 
-Remove AddressableInterface
+1) Remove AddressableInterface
  _ _ _ _ _ _ _ _ _ _ _ _ _ _
-Remove MultiAddressableInterface
+2) Remove MultiAddressableInterface
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-Remove AddressChangeableInterface
+3) Remove AddressChangeableInterface
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-Rename AddressDistrictableInterfaceToShow to AddressDistrictAwareInterface
+4) Rename AddressDistrictableInterfaceToShow to AddressDistrictAwareInterface
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-Rename AddressStreetableInterfaceToChange to AddressStreetAwareInterface
+5) Rename AddressStreetableInterfaceToChange to AddressStreetAwareInterface
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-Add service yit_geo_address_trasnformer
+6) Add service yit_geo_address_trasnformer
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-Add in yit_gro service function getAddressObjectById($id), this service return address object by address Id
+7) Add in yit_gro service function getAddressObjectById($id), this service return address object by address Id
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 If use 'geo_address' form type
 
 // in form type
 //namespace YourProject\YourBundle\Form\Type\YourFormType;
 
- $transformer = $this->container->get('yit_geo_address_trasnformer');
-
         // add a normal text field, but add your transformer to it
+        $transformer = $this->container->get('yit_geo_address_trasnformer');
         $builder->add(
             $builder->create('address', 'geo_address')
                 ->addModelTransformer($transformer));
         ;
- // in controller call YourFormType
 
- $form = $this->createForm(new YourFormType($this->container));
+        // in controller call YourFormType
+
+        $form = $this->createForm(new YourFormType($this->container));
 
 ## Update from 1.0.0 to 1.1.0
 ### Step 1 Configure project
 
 #### Step 1.1 Configure composer.json
-change in composer.json
+
+    change in composer.json
+    //
     "require": {
         "yit/geo-bridge-bundle": "1.0.0",
     }
@@ -69,7 +71,9 @@ change in composer.json
                  "Yit\\GeoBridgeBundle\\Command\\ManageGeoStoredProcedureCommand::manageGeoStoredProcedure"
                  ],
              }
-#### Warning. If you use  AddressableInterface, MultiAddressableInterface, AddressChangeableInterface Interfaces remove it.
+Warning. If you use  AddressableInterface, MultiAddressableInterface, AddressChangeableInterface Interfaces remove it.
+___________________________________________________________________________________________________________
+
 #### Update composer
 ### Step 2 Database config
 #### Step 2.1 Run mysql command

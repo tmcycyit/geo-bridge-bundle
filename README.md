@@ -77,7 +77,10 @@ you can also add other attributes to the form field.
 ``` php
 $this->createFormBuilder()
              ...
-             ->add('address', 'geo_address', array(
+             $transformer = $this->container->get('yit_geo_address_trasnformer');
+
+             ->add(
+             $builder->create('address', 'geo_address', array(
                 'attr' => array(
                     'data_id'       => 1,                   //must be unique for each such field
                     'placeholder'   => 'text for input',    //placeholder text
@@ -86,7 +89,11 @@ $this->createFormBuilder()
                     'button_class'  => 'buttonClass',       //new button class
                     'input_class'   => 'inputClass'         //input class
                 )))
+                ->addModelTransformer($transformer))        //call address Data transformer
              ...
+
+            // in controller call YourFormType
+             $form = $this->createForm(new YourFormType($this->container));
 ```
 
 #### Step5: Configured GeoBridgeBundle synchronization using run command after composer install or update
@@ -115,30 +122,6 @@ corresponding arguments, to set all necessary information.
 ## The interface implementations here`
 
 ``` php
-namespace Yit\GeoBridgeBundle\Model;
-
-//This interface is used when entity has an address_id field
-interface AddressableInterface
-{
-    //This function is used to get address id, the fields of which must be injected
-    public function getAddressId();
-
-    //This function is used to inject address title
-    public function setAddressTitle($title);
-
-    //This function is used to inject address latitude
-    public function setAddresLatitude($latitude);
-
-    //This function is used to inject address longitude
-    public function setAddresLongitude($longitude);
-
-    //This function is used to inject address h_number
-    public function setAddressHNumber($hNumber);
-
-    //This function is used to inject address eng_type
-    public function setAddressEngType($engType);
-}
-
 
 namespace Yit\GeoBridgeBundle\Model;
 
@@ -150,19 +133,6 @@ interface DistrictableInterface
 
     //This function is used to inject district title
     public function setDistrictTitle($title);
-}
-
-
-namespace Yit\GeoBridgeBundle\Model;
-
-//This interface is used when entity has more than one address
-interface MultiAddressableInterface
-{
-    //This function is used to get ids of addresses that must be injected
-    public function getAddressIds();
-
-    //This function inject addresses
-    public function setAddresses(array $addresses);
 }
 
 
@@ -201,28 +171,12 @@ interface AddressDistrictableInterface
 
 namespace Yit\GeoBridgeBundle\Model;
 
-//This interface is used to change address_id field
-interface AddressChangeableInterface
-{
-    //This function is used to get address id, the fields of which must be injected
-    public function getAddressId();
-
-    //This function is used to set Address Id
-    public function setAddressId($addressId);
-
-    //This function is used to get AddressId field name
-    public function getAddressField();
-}
-
-
-namespace Yit\GeoBridgeBundle\Model;
-
 /**
  * This interface is used when entity has an address_id and district_id
  * fields to set district id based on address id
  * district id is set from geo project, and if it is empty persist it, if does not match only set district id without persist
  */
-interface AddressDistrictableInterfaceToShow extends AddressDistrictableInterface
+interface AddressDistrictAwareInterface extends AddressDistrictableInterface
 {
 
 }
@@ -258,7 +212,7 @@ namespace Yit\GeoBridgeBundle\Model;
  * fields to set street id based on address id
  * street id is set from geo project and persist it is empty, if does not match only set street id without persist
  */
-interface AddressStreetableInterfaceToChange extends AddressStreetableInterface
+interface AddressStreetAwareInterface extends AddressStreetableInterface
 {
 
 }
@@ -267,9 +221,13 @@ interface AddressStreetableInterfaceToChange extends AddressStreetableInterface
 ### You can also use 'yit_geo' service to use some functions, there are here`
 
 ``` php
-//This function return address object by given id
+//This function return address object from main Geo project by given id
 //If there are not any address with such id return null
 public function getAddressById($id)
+
+//This function return address object by given id and create it in yit_geo_address table
+//If there are not any address with such id return Exception('Address not found!')
+public function getAddressObjectById($id)
 
 //This function is used get address synonym ids
 public function getSynonymIds($addressId)
@@ -341,6 +299,13 @@ public function getSearchStreetsByDistrict($search, $district, $limit = 0)
 The bundle use apc_cache and by default save addresses in the cache during 24 hours,
 you can change the time of experience by add the fallowing in your config.yml
 
+### You can also use 'yit_geo_address_trasnformer' service to, there are here`
+
+``` php
+//This service return address object from by given id and address data transform
+public function getAddressById($id)
+```
+
 ```yml
 yit_geo_bridge:
     experience: experience_time_in_seconds
@@ -352,6 +317,13 @@ done by add the following in the config.yml
 ```yml
 yit_geo_bridge:
     project_name: your_project_name
+```
+
+You can also add Geo main project domain in the config. If empty this config default http://geo.yerevan.am/
+
+```yml
+yit_geo_bridge:
+    project_domain: your_project_domain_route
 ```
 
 
