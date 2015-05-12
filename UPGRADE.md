@@ -97,7 +97,7 @@ to
  */
 protected $geoAddress;
 ```
-#### Step 2.2 Migration from 1.0.0 to 1.1.0
+#### Step 2.3 Migration from 1.0.0 to 1.1.0
 ```php
 run commands $ php app/console geo:manage:stored:procedure
              $ php app/console geo:address:migration
