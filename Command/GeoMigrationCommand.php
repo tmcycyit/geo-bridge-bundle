@@ -183,7 +183,7 @@ class GeoMigrationCommand extends ContainerAwareCommand
 
                         // call "GeoDataMigration" that creates new columns,
                         // inserts data from old columns into new columns and drop old geo address columns
-                        $connection->executeUpdate("CALL GeoDataMigration('{$table['name']}', '$databaseName', '$columnName')");
+//                        $connection->executeUpdate("CALL GeoDataMigration('{$table['name']}', '$databaseName', '$columnName')");
 
                         // let's check does new column "geo_$columnName" exit or not
                         $sthExist = $connection->prepare("CALL GeoExist(?, ?, ?)");
@@ -238,7 +238,7 @@ class GeoMigrationCommand extends ContainerAwareCommand
 							// get Geo main project domain from this project config if config is empty default set http://geo.yerevan.am/
 							$geoDomain = $this->getContainer()->getParameter('yit_geo_bridge.project_domain');
 
-							$addresses = $this->getContent($geoDomain . 'api/addresses/' . $id . '');
+							$addresses = $this->getContent($geoDomain . 'api/addresses/' . $id);
 
 							if (isset($addresses->title) && $addresses->title != null) {
 								$addressArm = $addresses->title;

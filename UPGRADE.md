@@ -6,6 +6,7 @@ Upgrade to 1.1.0
 before 1.1.0 version if use address need create relation ManyToOne to Address entity
 example
 
+``` php
     /**
      * @var integer
      * @ORM\ManyToOne(targetEntity="Yit\GeoBridgeBundle\Entity\Address")
@@ -15,24 +16,20 @@ example
     protected $geoAddress;
 
 Address entity have fields :
+```php
             $addressId, $armName, $engName, $latitude, $longitude, $created, $updated
-
+```
 1) Remove AddressableInterface
- _ _ _ _ _ _ _ _ _ _ _ _ _ _
 2) Remove MultiAddressableInterface
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 3) Remove AddressChangeableInterface
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 4) Rename AddressDistrictableInterfaceToShow to AddressDistrictAwareInterface
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 5) Rename AddressStreetableInterfaceToChange to AddressStreetAwareInterface
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 6) Add service yit_geo_address_trasnformer
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 7) Add in yit_gro service function getAddressObjectById($id), this service return address object by address Id
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-If use 'geo_address' form type
 
+### If use 'geo_address' form type
+
+``` php
 // in form type
 //namespace YourProject\YourBundle\Form\Type\YourFormType;
 
@@ -46,12 +43,13 @@ If use 'geo_address' form type
         // in controller call YourFormType
 
         $form = $this->createForm(new YourFormType($this->container));
-
+```
 ## Update from 1.0.0 to 1.1.0
 ### Step 1 Configure project
 
 #### Step 1.1 Configure composer.json
 
+``` json
     change in composer.json
     //
     "require": {
@@ -71,6 +69,7 @@ If use 'geo_address' form type
                  "Yit\\GeoBridgeBundle\\Command\\ManageGeoStoredProcedureCommand::manageGeoStoredProcedure"
                  ],
              }
+```
 Warning. If you use  AddressableInterface, MultiAddressableInterface, AddressChangeableInterface Interfaces remove it.
 ___________________________________________________________________________________________________________
 
@@ -81,15 +80,17 @@ ________________________________________________________________________________
 #### Warning. If you use unique kay in address fields remove it.
 
 #### Step 2.2 Create Mysql storage procedure
+```php
      run command $ php app/console geo:manage:stored:procedure
                  $ php app/console geo:address:migration
                  $ php app/console doctrine:schema:update --force
 
-
+```
 ## Enter configure config.yml
 ##### By default this config use "http://geo.yerevan.am/" . You can use dev or local domain
+```yml
             example
                 yit_geo_bridge:
                     project_domain: http://dev.geo.yerevan.am/
-
+```
 
