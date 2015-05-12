@@ -183,7 +183,7 @@ class GeoMigrationCommand extends ContainerAwareCommand
 
                         // call "GeoDataMigration" that creates new columns,
                         // inserts data from old columns into new columns and drop old geo address columns
-//                        $connection->executeUpdate("CALL GeoDataMigration('{$table['name']}', '$databaseName', '$columnName')");
+                        $connection->executeUpdate("CALL GeoDataMigration('{$table['name']}', '$databaseName', '$columnName')");
 
                         // let's check does new column "geo_$columnName" exit or not
                         $sthExist = $connection->prepare("CALL GeoExist(?, ?, ?)");

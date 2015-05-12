@@ -2,7 +2,7 @@ Upgrade to 1.1.0
 ===================
 
  Add entity Address
- _ _ _ _ _ _ _ _ _ _
+-----------------------
 before 1.1.0 version if use address need create relation ManyToOne to Yit\GeoBridgeBundle\Entity\Address entity
 example
 

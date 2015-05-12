@@ -299,12 +299,6 @@ public function getSearchStreetsByDistrict($search, $district, $limit = 0)
 The bundle use apc_cache and by default save addresses in the cache during 24 hours,
 you can change the time of experience by add the fallowing in your config.yml
 
-### You can also use 'yit_geo_address_trasnformer' service to, there are here`
-
-``` php
-//This service return address object from by given id and address data transform
-public function getAddressById($id)
-```
 
 ```yml
 yit_geo_bridge:
@@ -325,7 +319,3 @@ You can also add Geo main project domain in the config. If empty this config def
 yit_geo_bridge:
     project_domain: your_project_domain_route
 ```
-
-
-
-
