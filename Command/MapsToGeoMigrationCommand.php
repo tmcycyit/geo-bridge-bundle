@@ -135,9 +135,44 @@ class MapsToGeoMigrationCommand extends ContainerAwareCommand
                             END
 						";
 
+
+		// create Geo Data Modified storage procedure
+		$geoDataMigration = "DROP PROCEDURE IF EXISTS `GeoMapsDataMigration` ;
+						 CREATE PROCEDURE  `GeoMapsDataMigration` ( IN  `real_id` INT( 10 ) ,
+															   	IN  `arm_name` VARCHAR( 255 )  CHARSET utf8,
+															   	IN  `eng_name` VARCHAR( 255 )  CHARSET utf8,
+ 															   	IN  `latitude` decimal( 10,7 ) ,
+															   	IN  `longitude` decimal( 10,7),
+																IN `p_id` INT(10))
+						 COMMENT  'Geo data modified stored procedure' NOT DETERMINISTIC CONTAINS SQL SQL SECURITY DEFINER
+						 	BEGIN
+						 DECLARE geo_address_id DOUBLE;
+							DECLARE EXIT HANDLER FOR SQLEXCEPTION
+							 BEGIN
+								  ROLLBACK;
+							 END;
+							START TRANSACTION;
+
+						 SELECT id INTO geo_address_id
+						FROM  `yit_geo_address` WHERE id = real_id;
+
+						IF geo_address_id > -1 THEN
+						UPDATE  `yit_geo_address` SET arm_name = arm_name, eng_name = eng_name, latitude = latitude, longitude = longitude, updated = NOW(), p_id = p_id WHERE id = real_id;
+						ELSE
+						INSERT INTO  `yit_geo_address` (  `id` , `arm_name`, `eng_name`, `latitude`, `longitude`,  `created` ,  `updated`, `p_id` )
+						VALUES (
+							real_id, arm_name, eng_name, latitude, longitude, NOW( ) , NOW( ), p_id
+						);
+						END IF ;
+						COMMIT ;
+						END
+						";
+
+
 		//create storage procedures
 		$connection->executeUpdate($geoExistTable, $margeParams);
 		$connection->executeUpdate($geoDataDrop, $margeParams);
+		$em->executeUpdate($geoDataMigration, $margeParams);
 
 		//get entity`as we used geo address
 		$entities = array();
@@ -203,11 +238,22 @@ class MapsToGeoMigrationCommand extends ContainerAwareCommand
 						if (isset($exist['result']) && $exist['result'] > 0) {
 
 							// get addresses id`s in project
-							$addressCompany = " SELECT  geo_" . $columnName . " as geo_address, SUBSTRING_INDEX(  `coordinates` ,  ',', 1 ) as latitude , SUBSTRING_INDEX(  `coordinates` ,  ',', -1 ) as longitude
+							if($table['name'] == 'flag')
+							{
+								$addressCompany = " SELECT id as p_id, (SUBSTRING_INDEX( SUBSTRING_INDEX( geo_" . $columnName . " ,  '<p>', -1 ) ,  '</p>', 1 ))  as geo_address, SUBSTRING_INDEX(  `coordinates` ,  ',', 1 ) as latitude , SUBSTRING_INDEX(  `coordinates` ,  ',', -1 ) as longitude
 													FROM  " . $databaseName . "." . $table['name'] . "
 													WHERE  `coordinates` IS NOT NULL
 													AND geo_" . $columnName . " IS NOT NULL
 											";
+							}
+							else
+							{
+								$addressCompany = " SELECT  geo_" . $columnName . " as geo_address, SUBSTRING_INDEX(  `coordinates` ,  ',', 1 ) as latitude , SUBSTRING_INDEX(  `coordinates` ,  ',', -1 ) as longitude
+													FROM  " . $databaseName . "." . $table['name'] . "
+													WHERE  `coordinates` IS NOT NULL
+													AND geo_" . $columnName . " IS NOT NULL
+											";
+							}
 						}
 
 						$sthCompany = $connection->prepare("$addressCompany");
@@ -258,10 +304,15 @@ class MapsToGeoMigrationCommand extends ContainerAwareCommand
 						if (isset($address) && $address != null) {
 							$latitude = $ids["latitude"];
 							$longitude = $ids["longitude"];
+							if(isset($ids["p_id"]))
+							{
+								$pId = $ids["p_id"];
+							}
 						}
 						else {
 							$latitude = null;
 							$longitude = null;
+							$pId = null;
 						}
 
 						// insert address in YitGeoBridgeBundle:Address
@@ -297,10 +348,17 @@ class MapsToGeoMigrationCommand extends ContainerAwareCommand
 										EXECUTE stmt;
                                     END;
                                     BEGIN
+                                    	IF(tableName = 'flag') THEN
+										SET @update = CONCAT('UPDATE ',tableName,' SET ',mainColumn,' = (
+																SELECT id FROM yit_geo_address WHERE arm_name = CONCAT(<p>,',columnName,', </p>) COLLATE utf8_unicode_ci LIMIT 1)');
+										PREPARE stmt FROM @update ;
+										EXECUTE stmt;
+										ELSE
 										SET @update = CONCAT('UPDATE ',tableName,' SET ',mainColumn,' = (
 																SELECT id FROM yit_geo_address WHERE arm_name = ', columnName,' COLLATE utf8_unicode_ci LIMIT 1)');
 										PREPARE stmt FROM @update ;
 										EXECUTE stmt;
+										END IF;
                                     END;
 									BEGIN
 										SET @drop = CONCAT( 'ALTER TABLE ',tableName,' DROP ',columnName,' ') ;
@@ -344,7 +402,7 @@ class MapsToGeoMigrationCommand extends ContainerAwareCommand
 		DROP PROCEDURE IF EXISTS  CreateGeoRelation;
 		";
 
-		$connection->executeUpdate($finishSql, $margeParams);
+//		$connection->executeUpdate($finishSql, $margeParams);
 
 		$output->writeln("<info>GeoBridgeBundle and Project migration success ..</info>");
 	}

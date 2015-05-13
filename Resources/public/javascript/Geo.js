@@ -1,6 +1,6 @@
 'use stricts';
 
-angular.module("Geo")
+angular.module("Geo",[])
     .directive("yiInput",['$parse',function($parse){
         return {
             restrict: 'A',
