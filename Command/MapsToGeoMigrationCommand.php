@@ -201,15 +201,15 @@ class MapsToGeoMigrationCommand extends ContainerAwareCommand
 						$sthExist->closeCursor();
 
 						if (isset($exist['result']) && $exist['result'] > 0) {
-							// get addresses id`s in project
 
+							// get addresses id`s in project
 							$addressCompany = " SELECT  geo_" . $columnName . " as geo_address, SUBSTRING_INDEX(  `coordinates` ,  ',', 1 ) as latitude , SUBSTRING_INDEX(  `coordinates` ,  ',', -1 ) as longitude
 													FROM  " . $databaseName . "." . $table['name'] . "
 													WHERE  `coordinates` IS NOT NULL
 													AND geo_" . $columnName . " IS NOT NULL
-													AND geo_" . $columnName . " != '<p>&nbsp;</p>'
 											";
 						}
+
 						$sthCompany = $connection->prepare("$addressCompany");
 
 						$sthCompany->execute();

@@ -266,7 +266,9 @@ class YitGeo
 	public function putAddress($addressString)
 	{
 		$token = $this->container->get('security.context')->getToken();
-		if ($token) {
+		$user = $token->getUser();
+//		var_dump($user); exit;
+		if ($token && $token->getUser() != "anon.") {
 			$user = $token->getUser()->getUserName();
 		}
 		else {

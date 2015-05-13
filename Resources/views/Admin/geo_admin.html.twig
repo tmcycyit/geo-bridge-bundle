@@ -1,4 +1,5 @@
 {% block geo_address_widget %}
+    <div ng-app='GeoAutocomplete'>
     {% if attr is not defined %}
         {% set attr = [] %}
     {% endif %}
@@ -28,9 +29,9 @@
     {% endif %}
 
     {% verbatim %}
-    <input type="hidden" {% endverbatim %}id="{{ id }}"name="{{ full_name }}" value="{{ value }}" {% verbatim %} class="form-control form-control-small"
-    ng-model="geoObj{% endverbatim %}{{ attr['data_id'] }}{% verbatim %}.originalObject.id" yi-input/>
-<yit-autocomplete id="members{% endverbatim %}{{ attr['data_id'] }} {% verbatim %}"
+        <input type="hidden" {% endverbatim %}id="{{ id }}" name="{{ full_name }}" value="{{ value }}" {% verbatim %} class="form-control form-control-small"
+        ng-model="geoObj{% endverbatim %}{{ attr['data_id'] }}{% verbatim %}.originalObject.id" yi-input/>
+    <yit-autocomplete id="members{% endverbatim %}{{ attr['data_id'] }} {% verbatim %}"
     placeholder="{% endverbatim %}{{ attr['placeholder'] }} {% verbatim %}"
     pause="500"
     selectedobject="geoObj{% endverbatim %}{{ attr['data_id'] }} {% verbatim %}"
@@ -38,83 +39,19 @@
     titlefield="title"
     init-title-field="title"
     datafield="data"
-    addbutton="{% endverbatim %}{{ attr['button_name'] }} {% verbatim %}"
+    addbutton="{% endverbatim %}new{% verbatim %}"
     addbuttonclass="{% endverbatim %}{{ attr['button_class'] }} {% verbatim %}"
     addnew="{% endverbatim %}{{ attr['allow_new'] }} {% verbatim %}"
     addnewurl="/am/geo/putAddress/"
     {% endverbatim %}
     {% if value is not empty %}
-        {% verbatim %}
+    {% verbatim %}
         init-url="/am/geo/address/{{ geoObj{% endverbatim %}{{ attr['data_id'] }}{% verbatim %}.originalObject.id }}"
-        {% endverbatim %}
-        {% endif %}
-        {% verbatim %}
+    {% endverbatim %}
+{% endif %}
+{% verbatim %}
         inputclass="{% endverbatim %}{{ attr['input_class'] }} {% verbatim %}">
-        </yit-autocomplete>
-        {% endverbatim %}
-        {% endblock %}
-
-{% block mapmarker_widget %}
-    {# check attr array #}
-    {% if attr is not defined %}
-        {% set attr = [] %}
-    {% endif %}
-    {# check zoom #}
-    {% if attr.zoom is not defined %}
-        {% set attr = attr|merge({'zoom': 12}) %}
-    {% endif %}
-    {# check draggable #}
-    {% if attr.draggable is not defined %}
-        {% set attr = attr|merge({'draggable': 'true'}) %}
-    {% endif %}
-    {# check limit #}
-    {% if attr.limit is not defined %}
-        {% set attr = attr|merge({'limit': 1}) %}
-    {% endif %}
-    {# check center latitude #}
-    {% if attr.center_lat is not defined %}
-        {% set attr = attr|merge({'center_lat': 40.177037117759895}) %}
-    {% endif %}
-    {# check center longitude #}
-    {% if attr.center_lng is not defined %}
-        {% set attr = attr|merge({'center_lng': 44.51488494873047}) %}
-    {% endif %}
-    {# check editable inputs #}
-    {% if attr.editable is not defined %}
-        {% set attr = attr|merge({'editable': false}) %}
-    {% endif %}
-
-<div class="clearfix" ng-app="AGM">
-    <div class="span5">
-
-        <div class="row mapinputs">
-                <span class="span6">
-                    {% if attr.editable %}
-                    <input type="text" name="{{ full_name }}[lat]" id="{{ id }}[lat]" placeholder="Latitude"  ng-init="markerFor{{ name }}.Lat={{ value[name].lat | default("\'\'") }}" ng-model="markerFor{{ name }}.Lat" required="required" value="{{ value[name].lat | default("\'\'") }}" />
-                    {% else %}
-                        <input type="text" name="{{ full_name }}[lat]" id="{{ id }}[lat]" placeholder="Latitude"  ng-init="markerFor{{ name }}.Lat={{ value[name].lat | default("\'\'") }}" ng-model="markerFor{{ name }}.Lat" required="required" value="{{ value[name].lat | default("\'\'") }}" readonly/>
-                    {% endif %}
-                </span>
-                <span class="span6">
-                    {% if attr.editable %}
-                        <input type="text" name="{{ full_name }}[lng]" id="{{ id }}[lng]" placeholder="Longitude" ng-init="markerFor{{ name }}.Lng={{ value[name].lng | default("\'\'") }}" ng-model="markerFor{{ name }}.Lng" required="required" value="{{ value[name].lng | default("\'\'") }}" />
-                    {% else %}
-                        <input type="text" name="{{ full_name }}[lng]" id="{{ id }}[lng]" placeholder="Longitude" ng-init="markerFor{{ name }}.Lng={{ value[name].lng | default("\'\'") }}" ng-model="markerFor{{ name }}.Lng" required="required" value="{{ value[name].lng | default("\'\'") }}" readonly/>
-                    {% endif %}
-                </span>
-        </div>
-
-        <div class="simple-marker-main-block"
-             simple-marker
-             ng-marker="markerFor{{ name }}"
-             ng-marker-drag="{{ attr['draggable'] }}"
-             ng-marker-limit="{{ attr['limit'] }}"
-             ng-center-lat="{{ attr['center_lat'] }}"
-             ng-center-lng="{{ attr['center_lng'] }}"
-             ng-zoom="{{ attr['zoom'] }}">
-        </div>
+    </yit-autocomplete>
+{% endverbatim %}
     </div>
-</div>
-
-
-{% endblock %}
+    {% endblock %}
