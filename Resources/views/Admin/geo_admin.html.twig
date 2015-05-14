@@ -35,18 +35,18 @@
     placeholder="{% endverbatim %}{{ attr['placeholder'] }} {% verbatim %}"
     pause="500"
     selectedobject="geoObj{% endverbatim %}{{ attr['data_id'] }} {% verbatim %}"
-    url="/app_dev.php/am/geo/address/autocomplete/"
+    url="/am/geo/address/autocomplete/"
     titlefield="title"
     init-title-field="title"
     datafield="data"
     addbutton="{% endverbatim %}new{% verbatim %}"
     addbuttonclass="{% endverbatim %}{{ attr['button_class'] }} {% verbatim %}"
     addnew="{% endverbatim %}{{ attr['allow_new'] }} {% verbatim %}"
-    addnewurl="/app_dev.php/am/geo/putAddress/"
+    addnewurl="/am/geo/putAddress/"
     {% endverbatim %}
     {% if value is not empty %}
     {% verbatim %}
-        init-url="/app_dev.php/am/geo/address/{{ geoObj{% endverbatim %}{{ attr['data_id'] }}{% verbatim %}.originalObject.id }}"
+        init-url="/am/geo/address/{{ geoObj{% endverbatim %}{{ attr['data_id'] }}{% verbatim %}.originalObject.id }}"
     {% endverbatim %}
 {% endif %}
 {% verbatim %}
