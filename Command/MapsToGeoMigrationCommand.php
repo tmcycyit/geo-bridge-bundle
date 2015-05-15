@@ -205,11 +205,11 @@ class MapsToGeoMigrationCommand extends ContainerAwareCommand
 						if (isset($exist['result']) && $exist['result'] > 0) {
 
 							// get addresses id`s in project
-								$addressCompany = " SELECT geo_" . $columnName . " as geo_address, SUBSTRING_INDEX(  `coordinates` ,  ',', 1 ) as latitude , SUBSTRING_INDEX(  `coordinates` ,  ',', -1 ) as longitude
-													FROM  " . $databaseName . "." . $table['name'] . "
-													WHERE  `coordinates` IS NOT NULL
-													AND geo_" . $columnName . " IS NOT NULL
-											";
+							$addressCompany = " SELECT geo_" . $columnName . " as geo_address, SUBSTRING_INDEX(  `coordinates` ,  ',', 1 ) as latitude , SUBSTRING_INDEX(  `coordinates` ,  ',', -1 ) as longitude
+												FROM  " . $databaseName . "." . $table['name'] . "
+												WHERE geo_" . $columnName . " IS NOT NULL
+												AND geo_" . $columnName . " != ''
+										";
 						}
 
 						$sthCompany = $connection->prepare("$addressCompany");
@@ -235,23 +235,35 @@ class MapsToGeoMigrationCommand extends ContainerAwareCommand
 			//get id from id`s
 			foreach ($idResult as $ids) {
 
-			$mapsAddress = $ids["geo_address"];
-			$cleanAddress = mb_eregi_replace('</p>','', mb_eregi_replace('<p>','', mb_eregi_replace('&nbsp;','', mb_eregi_replace('<span class="st">','', mb_eregi_replace('</span>','', mb_eregi_replace('<br />','', $mapsAddress))))));
+			if($ids["geo_address"] != null)
+			{
+				$mapsAddress = $ids["geo_address"];
+				$cleanAddress = mb_eregi_replace('</p>','', mb_eregi_replace('<p>','', mb_eregi_replace('&nbsp;','', mb_eregi_replace('<span class="st">','', mb_eregi_replace('</span>','', mb_eregi_replace('<br />','', $mapsAddress))))));
 
-			// get Geo main project domain from this project config if config is empty default set http://geo.yerevan.am/
-			$geoDomain = $this->getContainer()->getParameter('yit_geo_bridge.project_domain');
-			// check address exist in Geo project
-			$opts = array('http' =>
-				array('method' => 'PUT',
-					'content' => http_build_query(
-						array('project_name' => $this->getContainer()->getParameter('yit_geo_bridge.project_name')))));
-			$hNumber = $this->produceUrlParameter($cleanAddress);
-			$ladit = $this->produceUrlParameter($ids["latitude"]);
-			$lodit = $this->produceUrlParameter($ids["longitude"]);
-			$context = stream_context_create($opts);
+				// get Geo main project domain from this project config if config is empty default set http://geo.yerevan.am/
+				$geoDomain = $this->getContainer()->getParameter('yit_geo_bridge.project_domain');
+				// check address exist in Geo project
+				$opts = array('http' =>
+					array('method' => 'PUT',
+						'content' => http_build_query(
+							array('project_name' => $this->getContainer()->getParameter('yit_geo_bridge.project_name')))));
+				$hNumber = $this->produceUrlParameter($cleanAddress);
 
-			$addresses = $this->getContent($geoDomain . "api/put/address/" . $hNumber . "/" . $ladit . "/" . $lodit, $context);
-			$addressEng = null;
+					if($ids["latitude"] != null && $ids["longitude"] != null)
+					{
+						$ladit = $this->produceUrlParameter($ids["latitude"]);
+						$lodit = $this->produceUrlParameter($ids["longitude"]);
+					}
+					else
+					{
+						$ladit = $this->produceUrlParameter(40.179496298328);
+						$lodit = $this->produceUrlParameter(44.512739181518);
+					}
+
+				$context = stream_context_create($opts);
+
+				$addresses = $this->getContent($geoDomain . "api/put/address/" . $hNumber . "/" . $ladit . "/" . $lodit, $context);
+				$addressEng = null;
 
 				if (isset($addresses) && $addresses != null) {
 
@@ -268,7 +280,9 @@ class MapsToGeoMigrationCommand extends ContainerAwareCommand
 					$connection->executeUpdate("CALL GeoDataModified($addresses , '$mapsAddress', '$addressEng', '$latitude', '$longitude')");
 				}
 			}
+
 		}
+	}
 		// create MySQL storage procedure
 		// This storage procedure create columns for relation, create relations, insert data, drop temp column`s
 		$geoDataRelation = "DROP PROCEDURE IF EXISTS `CreateGeoRelation` ;
