@@ -116,7 +116,7 @@ class MapsToGeoMigrationCommand extends ContainerAwareCommand
                                     AND table_schema = dbName
                                     AND column_name = columnName)
                                 THEN
-                                	BEGIN
+                                    BEGIN
 										SET @alter = CONCAT(  'ALTER TABLE ',tableName,' ADD geo_', columnName,' VARCHAR( 255 )  CHARSET utf8 ;') ;
 										PREPARE stmt FROM @alter ;
 										EXECUTE stmt;
@@ -188,6 +188,15 @@ class MapsToGeoMigrationCommand extends ContainerAwareCommand
 
 						// call "GeoDataMigration" that creates new columns,
 						// inserts data from old columns into new columns and drop old geo address columns
+						$update = "UPDATE " .$table['name']." SET " . $columnName . "  = (SELECT content
+									FROM " .$table['name']."_translation
+									WHERE " .$table['name']."_translation.object_id = " .$table['name'].".id
+									AND " .$table['name']."_translation.locale = 'am'
+									AND  " .$table['name']."_translation.field = 'address' );"
+						;
+
+						$connection->executeUpdate($update, $margeParams);
+
 						$connection->executeUpdate("CALL GeoDataMigration('{$table['name']}', '$databaseName', '$columnName')");
 
 						// let's check does new column "geo_$columnName" exit or not
@@ -205,10 +214,13 @@ class MapsToGeoMigrationCommand extends ContainerAwareCommand
 						if (isset($exist['result']) && $exist['result'] > 0) {
 
 							// get addresses id`s in project
-							$addressCompany = " SELECT geo_" . $columnName . " as geo_address, SUBSTRING_INDEX(  `coordinates` ,  ',', 1 ) as latitude , SUBSTRING_INDEX(  `coordinates` ,  ',', -1 ) as longitude
+							$addressCompany = " SELECT " . $table['name'] . "_translation.content as geo_address, SUBSTRING_INDEX(  `coordinates` ,  ',', 1 ) as latitude , SUBSTRING_INDEX(  `coordinates` ,  ',', -1 ) as longitude
 												FROM  " . $databaseName . "." . $table['name'] . "
-												WHERE geo_" . $columnName . " IS NOT NULL
-												AND geo_" . $columnName . " != ''
+												LEFT JOIN " . $table['name'] . "_translation ON " . $table['name'] . ".id = " . $table['name'] . "_translation.object_id
+												WHERE " . $table['name'] . "_translation.locale = 'am'
+												AND " . $table['name'] . "_translation.field = 'address'
+												AND " . $table['name'] . "_translation.content IS NOT NULL
+												AND " . $table['name'] . "_translation.content != '';
 										";
 						}
 
@@ -268,12 +280,20 @@ class MapsToGeoMigrationCommand extends ContainerAwareCommand
 				if (isset($addresses) && $addresses != null) {
 
 					if (isset($mapsAddress) && $mapsAddress != null) {
-						$latitude = $ids["latitude"];
-						$longitude = $ids["longitude"];
+						if(isset( $ids["latitude"]) &&  $ids["latitude"] != null && isset($ids["longitude"]) && $ids["longitude"] != null)
+						{
+							$latitude = $ids["latitude"];
+							$longitude = $ids["longitude"];
+						}
+						else
+						{
+							$latitude = 40.179496298328;
+							$longitude = 44.512739181518;
+						}
 					}
 					else {
-						$latitude = null;
-						$longitude = null;
+							$latitude = null;
+							$longitude = null;
 					}
 
 					// insert address in YitGeoBridgeBundle:Address
