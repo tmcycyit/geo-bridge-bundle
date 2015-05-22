@@ -30,7 +30,7 @@ class Address
 	/**
 	 * @var string
 	 *
-	 * @Assert\Regex(pattern="/^(([Ա-ՖՈՉՊՋՍՎՏՐՑՒՓՔՕա-ֆևփւրցքօ\֊\.․, \/\s0-9]{0,})){1,1}$/i", message="Street Arm name type is invalid")
+	 * @Assert\Regex(pattern="/^(([Ա-ՖՈՉՊՋՌՍՎՏՐՑՒՓՔՕա-ֆևփւրցքօ\֊\.․, \/\s0-9]{0,})){1,1}$/i", message="Street Arm name type is invalid")
 	 * @ORM\Column(name="arm_name", type="string", length=255, nullable=true)
 	 * @Groups({"place", "placeSide", "company", "model"})
 	 */
