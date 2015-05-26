@@ -405,9 +405,9 @@ class YitGeo
 	 */
 	public function getDistrictList()
 	{
-		$districtsList = apc_fetch('districtsList');
+//		$districtsList = apc_fetch('districtsList');
 
-		if ($districtsList === false) {
+//		if ($districtsList === false) {
 			$districts = $this->getDistricts();
 			$districtsList = array();
 
@@ -418,8 +418,8 @@ class YitGeo
 			}
 
 			//Store districtList in cache 24 hours
-			apc_add('districtsList', $districtsList, $this->experience);
-		}
+//			apc_add('districtsList', $districtsList, $this->experience);
+//		}
 
 		return $districtsList;
 	}
