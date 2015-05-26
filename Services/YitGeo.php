@@ -108,20 +108,20 @@ class YitGeo
 	public function getAddressById($id)
 	{
 
-		$address = apc_fetch('address_' . $id);
-
-		if ($address === false) {
-
-			if (isset($address) && $address != null) {
-				$address = $address->getAddress();
-			}
-			else {
+//		$address = apc_fetch('address_' . $id);
+//
+//		if ($address === false) {
+//
+//			if (isset($address) && $address != null) {
+//				$address = $address->getAddress();
+//			}
+//			else {
 				$address = $this->getContent($this->geoDomain . 'api/addresses/' . $id);
 				//Store address in cache 24 hours
-			}
-			apc_add('address_' . $id, $address, $this->experience);
-
-		}
+//			}
+//			apc_add('address_' . $id, $address, $this->experience);
+//
+//		}
 
 		return $address;
 	}
