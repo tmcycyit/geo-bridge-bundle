@@ -266,8 +266,6 @@ class YitGeo
 	public function putAddress($addressString)
 	{
 		$token = $this->container->get('security.context')->getToken();
-		$user = $token->getUser();
-//		var_dump($user); exit;
 		if ($token && $token->getUser() != "anon.") {
 			$user = $token->getUser()->getUserName();
 		}
@@ -368,13 +366,13 @@ class YitGeo
 	 */
 	public function getDistrictById($id)
 	{
-		$district = apc_fetch('district_' . $id);
-
-		if ($district === false) {
+//		$district = apc_fetch('district_' . $id);
+//
+//		if ($district === false) {
 			$district = $this->getContent($this->geoDomain . 'api/districts/' . $id);
 			//Store district in cache 24 hours
-			apc_add('district_' . $id, $district, $this->experience);
-		}
+//			apc_add('district_' . $id, $district, $this->experience);
+//		}
 
 		return $district;
 	}
@@ -388,13 +386,13 @@ class YitGeo
 	 */
 	public function getDistricts()
 	{
-		$districts = apc_fetch('districts');
-
-		if ($districts === false) {
+//		$districts = apc_fetch('districts');
+//
+//		if ($districts === false) {
 			$districts = $this->getContent($this->geoDomain . 'api/districts');
 			//Store districts in cache 24 hours
-			apc_add('districts', $districts, $this->experience);
-		}
+//			apc_add('districts', $districts, $this->experience);
+//		}
 
 		return $districts;
 	}
