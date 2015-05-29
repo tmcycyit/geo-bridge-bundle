@@ -11,7 +11,6 @@ example
      * @var integer
      * @ORM\ManyToOne(targetEntity="Yit\GeoBridgeBundle\Entity\Address")
      * @ORM\JoinColumn(name="address", nullable=true)
-     * @Grid\Column(field="geoAddress.armName")
      */
     protected $geoAddress;
 ```
@@ -110,4 +109,10 @@ run commands $ php app/console geo:manage:stored:procedure
     yit_geo_bridge:
         project_domain: http://dev.geo.yerevan.am/
 ```
+## Project database and Geo main project database synchronization.
+```txt
+    For synchronization call php app/console geo:data:manager command.
+    After then your yit_geo_address table data updated. And then your project will be compatible with Geo main project.
+```
+
 
