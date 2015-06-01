@@ -107,21 +107,7 @@ class YitGeo
 	 */
 	public function getAddressById($id)
 	{
-
-//		$address = apc_fetch('address_' . $id);
-//
-//		if ($address === false) {
-//
-//			if (isset($address) && $address != null) {
-//				$address = $address->getAddress();
-//			}
-//			else {
-				$address = $this->getContent($this->geoDomain . 'api/addresses/' . $id);
-				//Store address in cache 24 hours
-//			}
-//			apc_add('address_' . $id, $address, $this->experience);
-//
-//		}
+		$address = $this->getContent($this->geoDomain . 'api/addresses/' . $id);
 
 		return $address;
 	}
@@ -366,13 +352,7 @@ class YitGeo
 	 */
 	public function getDistrictById($id)
 	{
-//		$district = apc_fetch('district_' . $id);
-//
-//		if ($district === false) {
-			$district = $this->getContent($this->geoDomain . 'api/districts/' . $id);
-			//Store district in cache 24 hours
-//			apc_add('district_' . $id, $district, $this->experience);
-//		}
+		$district = $this->getContent($this->geoDomain . 'api/districts/' . $id);
 
 		return $district;
 	}
@@ -386,13 +366,7 @@ class YitGeo
 	 */
 	public function getDistricts()
 	{
-//		$districts = apc_fetch('districts');
-//
-//		if ($districts === false) {
-			$districts = $this->getContent($this->geoDomain . 'api/districts');
-			//Store districts in cache 24 hours
-//			apc_add('districts', $districts, $this->experience);
-//		}
+		$districts = $this->getContent($this->geoDomain . 'api/districts');
 
 		return $districts;
 	}
@@ -405,21 +379,14 @@ class YitGeo
 	 */
 	public function getDistrictList()
 	{
-//		$districtsList = apc_fetch('districtsList');
+		$districts = $this->getDistricts();
+		$districtsList = array();
 
-//		if ($districtsList === false) {
-			$districts = $this->getDistricts();
-			$districtsList = array();
-
-			if ($districts) {
-				foreach ($districts as $value) {
-					$districtsList[$value->id] = $value->title;
-				}
+		if ($districts) {
+			foreach ($districts as $value) {
+				$districtsList[$value->id] = $value->title;
 			}
-
-			//Store districtList in cache 24 hours
-//			apc_add('districtsList', $districtsList, $this->experience);
-//		}
+		}
 
 		return $districtsList;
 	}
@@ -433,14 +400,7 @@ class YitGeo
 	 */
 	public function getStreetsByDistrict($districtID)
 	{
-		$streets = apc_fetch('district_streets');
-
-		if ($streets === false) {
-			$streets = $this->getContent($this->geoDomain . 'api/districts/' . $districtID . '/streets');
-
-			//Store streets in cache 24 hours
-			apc_add('district_streets', $streets, $this->experience);
-		}
+		$streets = $this->getContent($this->geoDomain . 'api/districts/' . $districtID . '/streets');
 
 		return $streets;
 	}
@@ -472,14 +432,7 @@ class YitGeo
 	 */
 	public function getStreetById($id)
 	{
-		$street = apc_fetch('street_' . $id);
-
-		if ($street === false) {
-			$street = $this->getContent($this->geoDomain . 'api/streets/' . $id);
-
-			//Store district in cache 24 hours
-			apc_add('street_' . $id, $street, $this->experience);
-		}
+		$street = $this->getContent($this->geoDomain . 'api/streets/' . $id);
 
 		return $street;
 	}
@@ -494,14 +447,7 @@ class YitGeo
 	 */
 	public function getStreetByAddressId($id)
 	{
-		$street = apc_fetch('address_street_' . $id);
-
-		if ($street === false) {
-			$street = $this->getContent($this->geoDomain . 'api/addresses/' . $id . '/street');
-
-			//Store district in cache 24 hours
-			apc_add('address_street_' . $id, $street, $this->experience);
-		}
+		$street = $this->getContent($this->geoDomain . 'api/addresses/' . $id . '/street');
 
 		return $street;
 	}
