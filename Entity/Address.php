@@ -42,7 +42,6 @@ class Address
 	 *
 	 * @Assert\Regex(pattern="/^([A-z\֊\.․, 0-9]{0,}){1,1}$/i", message="Street Eng name type is invalid")
 	 * @ORM\Column(name="eng_name", type="string", length=255, nullable=true)
-     * Groups({"statement"})
 	 */
 	private $engName;
 
