@@ -24,6 +24,7 @@ class Address
 	 * @ORM\Id
      * @var integer
      * @ORM\Column(name="id", type="integer", unique=true)
+     * @Groups({"statement"})
      */
     private $addressId;
 
@@ -32,7 +33,7 @@ class Address
 	 *
 	 * @Assert\Regex(pattern="/^(([Ա-ՖՈՉՊՋՌՍՎՏՐՑՒՓՔՕա-ֆևփւրցքօ\֊\.․, \/\s0-9]{0,})){1,1}$/i", message="Street Arm name type is invalid")
 	 * @ORM\Column(name="arm_name", type="string", length=255, nullable=true)
-	 * @Groups({"place", "placeSide", "company", "model"})
+	 * @Groups({"place", "placeSide", "company", "model", "statement"})
 	 */
 	private $armName;
 
@@ -41,6 +42,7 @@ class Address
 	 *
 	 * @Assert\Regex(pattern="/^([A-z\֊\.․, 0-9]{0,}){1,1}$/i", message="Street Eng name type is invalid")
 	 * @ORM\Column(name="eng_name", type="string", length=255, nullable=true)
+     * Groups({"statement"})
 	 */
 	private $engName;
 
