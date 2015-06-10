@@ -96,6 +96,50 @@ $this->createFormBuilder()
              $form = $this->createForm(new YourFormType($this->container));
 ```
 
+Then you can add a new form field in Sonata Admin`
+
+``` php
+namespace Project\MyBundle\Admin;
+
+    protected function configureFormFields(FormMapper $formMapper)
+
+    {
+$container = $this->configurationPool->getContainer();
+		$transformer = $container->get('yit_geo_address_trasnformer');
+
+$formMapper
+            ->add(
+                $formMapper->create('address', 'geo_address',  array(
+                    'attr' => array(
+                        'data_id'       => 1,
+                        'placeholder'   => 'text for input',
+                        'allow_new'     => true,
+                        'button_name'   => 'buttonName',
+                        'button_class'  => 'buttonClass',
+                        'input_class'   => 'inputClass'
+                    )))
+                    ->addModelTransformer($transformer))
+    }
+
+public function getFormTheme()
+{
+    return array_merge(
+        parent::getFormTheme(),
+        array('YitGeoBridgeBundle:Admin:geo_admin.html.twig' )
+    );
+}
+```
+In Sonata Admin template add js
+
+``` twig
+
+    <script src="{{ asset('app/bower_components/YitAutocomplete/yitAutocomplete.js') }}"></script>
+    <script src="{{ asset('bundles/yitgeobridge/javascript/geo.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('bundles/yitgeobridge/javascript/yiInput.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('bundles/yitgeobridge/javascript/GeoAutocomplete.js') }}" type="text/javascript"></script>
+
+```
+
 #### Step5: Configured GeoBridgeBundle synchronization using run command after composer install or update
 
 Add RunManageGeoStoredProcedureCommand in your composer.json:
@@ -319,3 +363,4 @@ You can also add Geo main project domain in the config. If empty this config def
 yit_geo_bridge:
     project_domain: your_project_domain_route
 ```
+
