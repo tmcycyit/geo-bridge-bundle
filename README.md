@@ -96,38 +96,37 @@ $this->createFormBuilder()
              $form = $this->createForm(new YourFormType($this->container));
 ```
 
-Then you can add a new form field in Sonata Admin`
+Then you can add a address form field in Sonata Admin`
 
 ``` php
 namespace Project\MyBundle\Admin;
 
-    protected function configureFormFields(FormMapper $formMapper)
+    protected function configureFormFields(FormMapper $formMapper){
 
-    {
-$container = $this->configurationPool->getContainer();
-		$transformer = $container->get('yit_geo_address_trasnformer');
+            $container = $this->configurationPool->getContainer();
+            $transformer = $container->get('yit_geo_address_trasnformer');
 
-$formMapper
-            ->add(
-                $formMapper->create('address', 'geo_address',  array(
-                    'attr' => array(
-                        'data_id'       => 1,
-                        'placeholder'   => 'text for input',
-                        'allow_new'     => true,
-                        'button_name'   => 'buttonName',
-                        'button_class'  => 'buttonClass',
-                        'input_class'   => 'inputClass'
-                    )))
-                    ->addModelTransformer($transformer))
+            $formMapper
+                ->add(
+                    $formMapper->create('address', 'geo_address',  array(
+                        'attr' => array(
+                            'data_id'       => 1,
+                            'placeholder'   => 'text for input',
+                            'allow_new'     => true,
+                            'button_name'   => 'buttonName',
+                            'button_class'  => 'buttonClass',
+                            'input_class'   => 'inputClass'
+                        )))
+                        ->addModelTransformer($transformer))
     }
 
-public function getFormTheme()
-{
-    return array_merge(
-        parent::getFormTheme(),
-        array('YitGeoBridgeBundle:Admin:geo_admin.html.twig' )
-    );
-}
+    public function getFormTheme(){
+
+            return array_merge(
+                parent::getFormTheme(),
+                array('YitGeoBridgeBundle:Admin:geo_admin.html.twig' )
+            );
+    }
 ```
 In Sonata Admin template add js
 
