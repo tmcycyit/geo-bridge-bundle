@@ -12,7 +12,7 @@ Add GeoBridgeBundle in your composer.json:
 {
     "require": {
         ...
-        "yit/geo-bridge-bundle": "dev-master",
+        "tmcycyit/geo-bridge-bundle": "dev-master",
     }
 }
 ```
