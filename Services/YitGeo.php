@@ -13,7 +13,7 @@ use FOS\RestBundle\Util\Codes;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\Validator\Constraints\Null;
+use Symfony\Component\Validator\Constraints\IsNull;
 use Yit\GeoBridgeBundle\Entity\Address;
 use Yit\GeoBridgeBundle\Form\DataTransformer\AddressToObjectTransformer;
 
