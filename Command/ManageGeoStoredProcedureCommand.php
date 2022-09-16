@@ -7,7 +7,7 @@ use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\PhpExecutableFinder;
-use Composer\Script\CommandEvent;
+use Composer\Script\Event;
 
 /**
  * This class used for create geo storage procedures after composer install or update
@@ -19,9 +19,9 @@ class ManageGeoStoredProcedureCommand {
 
 	/**
 	 * This function run MySQL storage procedures after composer install or update
-	 * @param $event CommandEvent A instance
+	 * @param $event Event A instance
 	 */
-	public static function manageGeoStoredProcedure(CommandEvent $event)
+	public static function manageGeoStoredProcedure(Event $event)
 	{
 		$options = self::getOptions($event);
 		$appDir = $options['symfony-app-dir'];
@@ -32,10 +32,10 @@ class ManageGeoStoredProcedureCommand {
 	/**
 	 * Gives options command
 	 *
-	 * @param CommandEvent $event
+	 * @param Event $event
 	 * @return array
 	 */
-	protected static function getOptions(CommandEvent $event)
+	protected static function getOptions(Event $event)
 	{
 		$options = array_merge(array(
 			'symfony-app-dir' => 'app',
@@ -46,12 +46,12 @@ class ManageGeoStoredProcedureCommand {
 
 	/**
 	 *
-	 * @param CommandEvent $event
+	 * @param Event $event
 	 * @param $appDir
 	 * @param $cmd
 	 * @param int $timeout
 	 */
-	protected static function executeCommand(CommandEvent $event, $appDir, $cmd, $timeout = 300)
+	protected static function executeCommand(Event $event, $appDir, $cmd, $timeout = 300)
 	{
 		$php = escapeshellarg(self::getPhp());
 		$console = escapeshellarg($appDir.'/console');
