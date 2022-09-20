@@ -10,6 +10,7 @@ namespace Yit\GeoBridgeBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Yit\GeoBridgeBundle\Entity\Address;
 
@@ -69,7 +70,7 @@ class GeoBridgeController extends Controller
      * @Route("/address/district/autocomplete/{districtId}/{search}", requirements={"search" = ".+"})
      * @param $search
      * @param $districtId
-     * @return Response
+     * @return JsonResponse
      */
     public function getAddressesAction($search, $districtId = 0)
     {
@@ -86,9 +87,10 @@ class GeoBridgeController extends Controller
             }
         }
 
-        $addresses = json_encode($addresses);
+        $addresses = (array)$addresses;
+        $addresses = array_shift($addresses);
 
-        return new Response($addresses);
+        return new JsonResponse($addresses);
     }
 
 	/**
