@@ -224,14 +224,15 @@ class GeoBridgeController extends Controller
      *
      * @Route("/district/autocomplete/{search}")
      * @param $search
-     * @return Response
+     * @return JsonResponse\
      */
     public function getDistrictAction($search)
     {
         $district = $this->get('yit_geo')->searchDistrict($search);
-        $district = json_encode($district);
+        $district = (array)$district;
+        $district = array_shift($district);
 
-        return new Response($district);
+        return new JsonResponse($district);
     }
 
     /**
